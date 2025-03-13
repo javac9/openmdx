@@ -67,6 +67,7 @@ import org.openmdx.base.rest.cci.ConditionRecord;
 import org.openmdx.base.rest.cci.FeatureOrderRecord;
 import org.openmdx.base.rest.cci.QueryExtensionRecord;
 import org.openmdx.base.rest.spi.QueryFilterRecord;
+import org.openmdx.base.text.conversion.JavaBeans;
 
 /**
  * A filter allows to retrieve subsets of filterable maps and to sort
@@ -76,7 +77,7 @@ import org.openmdx.base.rest.spi.QueryFilterRecord;
  * The Filter class is bean-compliant. Hence, it can be externalized
  * with the XMLDecoder.
  * 
- * @see org.openmdx.base.text.conversion.JavaBeans
+ * @see JavaBeans
  */
 public class Filter extends QueryFilterRecord {
 
@@ -164,7 +165,7 @@ public class Filter extends QueryFilterRecord {
         Class<E> valueClass,
         ConditionRecord condition
     ){
-        List<E> target = new ArrayList<E>();
+        List<E> target = new ArrayList<>();
         Object[] source = condition.getValue();
         if(source != null){
             for(Object value : source) {
@@ -278,7 +279,7 @@ public class Filter extends QueryFilterRecord {
     /**
      * Replace the order specifiers
      * 
-     * @param order specifiers
+     * @param orderSpecifiers specifiers
      */
     public void setOrderSpecifier(
         List<OrderSpecifier> orderSpecifiers
@@ -333,7 +334,7 @@ public class Filter extends QueryFilterRecord {
     /**
      * Set extensions.
      * 
-     * @param extension The extension to set.
+     * @param extensions The extensions to set.
      */
     public void setExtension(
         QueryExtensionRecord[] extensions

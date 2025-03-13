@@ -176,7 +176,7 @@ public class Jmi1ContainerInvocationHandlerWithCciDelegate extends AbstractJmi1C
              );
         } else if (declaringClass == Collection.class) {
             if("toArray".equals(methodName) && args != null && args.length == 1) {
-                Object[] source = ((Collection<?>)this.cciDelegate).toArray();
+                Object[] source = this.cciDelegate.toArray();
                 Object[] target = (Object[]) args[0];
                 int size = this.cciDelegate.size();
                 if (target.length < size){
@@ -230,7 +230,7 @@ public class Jmi1ContainerInvocationHandlerWithCciDelegate extends AbstractJmi1C
             } else if("getAll".equals(methodName) && args.length == 1) {
                 return this.marshaller.marshal(
                     this.cciDelegate.getAll(
-                        (AnyTypePredicate)this.marshaller.unmarshal(args[0])
+                        (AnyTypePredicate<>)this.marshaller.unmarshal(args[0])
                     )
                 );
             } else if("removeAll".equals(methodName) && args.length == 1) {

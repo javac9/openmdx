@@ -164,7 +164,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
     }
 
     //-----------------------------------------------------------------------
-    public abstract class RefPredicate implements AnyTypePredicate {
+    public abstract class RefPredicate implements AnyTypePredicate<RefQuery_1> {
 
         public RefPredicate(
             Quantifier quantifier,
@@ -236,7 +236,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          * @see org.w3c.cci2.AnyTypePredicate#equalTo(V)
          */
         public void equalTo(
-            Object operand
+                RefQuery_1 operand
         ) {
             this.elementOf(
                 Collections.singleton(operand));
@@ -248,7 +248,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          * @see org.w3c.cci2.AnyTypePredicate#elementOf(V...)
          */
         public void elementOf(
-            Object... operand
+                RefQuery_1... operand
         ) {
             this.elementOf(
                 Arrays.asList(operand));
@@ -282,7 +282,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          * @see org.w3c.cci2.AnyTypePredicate#notEqual(V)
          */
         public void notEqualTo(
-            Object operand
+                RefQuery_1 operand
         ) {
             this.notAnElementOf(
                 Collections.singleton(operand));
@@ -294,7 +294,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          * @see org.w3c.cci2.AnyTypePredicate#notAnElementOf(V...)
          */
         public void notAnElementOf(
-            Object... operand
+                RefQuery_1... operand
         ) {
             this.notAnElementOf(
                 Arrays.asList(operand));
@@ -415,7 +415,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
     }
 
     //-------------------------------------------------------------------------
-    public class RefSimpleTypePredicate extends RefPredicate implements AnyTypePredicate {
+    public class RefSimpleTypePredicate extends RefPredicate {
 
         public RefSimpleTypePredicate(
             Quantifier quantifier,
@@ -431,7 +431,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          */
         @Override
         public void equalTo(
-            Object operand
+                RefQuery_1 operand
         ) {
             this.elementOf(
                 Collections.singleton(operand));
@@ -444,7 +444,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          */
         @Override
         public void elementOf(
-            Object... operand
+                RefQuery_1... operand
         ) {
             this.elementOf(
                 Arrays.asList(operand));
@@ -472,7 +472,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          */
         @Override
         public void notEqualTo(
-            Object operand
+                RefQuery_1 operand
         ) {
             this.notAnElementOf(
                 Collections.singleton(operand));
@@ -485,7 +485,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
          */
         @Override
         public void notAnElementOf(
-            Object... operand
+                RefQuery_1... operand
         ) {
             this.notAnElementOf(
                 Arrays.asList(operand));
@@ -1644,7 +1644,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
     /**
      * Add a sort order
      * 
-     * @param the
+     * @param featureDef
      *            feature's model element
      * @param order
      *            the sort order
@@ -1769,7 +1769,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
     /**
      * Add a sort order
      * 
-     * @param the
+     * @param featureName
      *            feature
      * @param order
      *            the sort order
@@ -2400,7 +2400,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
         boolean ignoreCache
     ) {
         if (ignoreCache) {
-            throw new javax.jdo.JDOUnsupportedOptionException("Ignore cache is not supported by openMDX");
+            throw new JDOUnsupportedOptionException("Ignore cache is not supported by openMDX");
         }
     }
 

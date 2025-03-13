@@ -60,13 +60,13 @@ public interface DateTimeStateContext extends StateContext<Date> {
      * 
      * @return the view's validFrom
      */
-    public Date getValidFrom();
+    Date getValidFrom();
 
     /**
      * Tells up to when on modifications are valid
      * 
      * @return the view's validFrom
      */
-    public Date getInvalidFrom();
+    Date getInvalidFrom();
 
 }

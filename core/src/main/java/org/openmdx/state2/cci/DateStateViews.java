@@ -538,9 +538,9 @@ public class DateStateViews {
      * 
      * @return the state context aware predicate
      */
-    private static AnyTypePredicate getStatePredicate(
+    private static AnyTypePredicate<Object> getStatePredicate(
         RefContainer<?> refContainer,
-        AnyTypePredicate predicate
+        AnyTypePredicate<Object> predicate
     ) {
         if (predicate == null)
             return null;
@@ -571,13 +571,12 @@ public class DateStateViews {
     /**
      * Retrieve the valid state predicate
      * 
-     * @param refContainer
      * @param predicate
      * 
      * @return the valid state predicate
      */
-    private static AnyTypePredicate getValidStatePredicate(
-        AnyTypePredicate predicate
+    private static AnyTypePredicate<Object> getValidStatePredicate(
+        AnyTypePredicate<Object> predicate
     ) {
         Filter newFilter;
         if (predicate == null) {
@@ -624,7 +623,7 @@ public class DateStateViews {
      */
     public static <T extends DateState> List<T> getStates(
         Container<? super T> container,
-        AnyTypePredicate predicate
+        AnyTypePredicate<T> predicate
     ) {
         RefContainer<? super T> refContainer = (RefContainer<? super T>) container;
         Container<T> coreContainer = getTimeIndependentContainer(refContainer);
@@ -645,7 +644,7 @@ public class DateStateViews {
      */
     public static <T extends DateState> List<T> getValidStates(
         Container<? super T> container,
-        AnyTypePredicate predicate
+        AnyTypePredicate<T> predicate
     ) {
         RefContainer<? super T> refContainer = (RefContainer<? super T>) container;
         Container<T> coreContainer = getTimeIndependentContainer(refContainer);
@@ -2386,12 +2385,12 @@ public class DateStateViews {
      */
     public static <T extends DateState> void forEachState(
         Container<? super T> container,
-        AnyTypePredicate predicate,
+        AnyTypePredicate<T> predicate,
         Consumer<T> consumer
     ) {
         final RefContainer<? super T> refContainer = (RefContainer<? super T>) container;
         final Container<T> coreContainer = getTimeIndependentContainer(refContainer);
-        final AnyTypePredicate statePredicate = getStatePredicate(refContainer, predicate);
+        final AnyTypePredicate<T> statePredicate = getStatePredicate(refContainer, predicate);
         final Consumer<T> marshallingConsumer = new MarshallingStateConsumer<>(consumer);
         coreContainer.processAll(statePredicate, marshallingConsumer);
     }
