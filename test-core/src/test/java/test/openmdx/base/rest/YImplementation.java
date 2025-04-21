@@ -79,9 +79,43 @@ public class YImplementation
         return Collections.singletonList(this.date);
     }
 
-	public <T extends #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant#endif> List<T> list() {
-		return (List<T>) getList();
-	}
+//	public <T extends #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant#endif> List<T> list() {
+//		return (List<T>) getList();
+//	}
+
+//    public <T extends Date> List<T> list() {
+//        return (List<T>) getList();
+//    }
+
+
+
+
+    #if CLASSIC_CHRONO_TYPES
+    @Override
+    public <T extends Date> List<T> list() {
+        return (List<T>) getList();
+    }
+    #else
+    @Override
+    public <T extends java.time.Instant> List<T> list() {
+        // For non-classic mode, we can't convert java.sql.Date to Instant directly
+        // You might want to throw an exception or implement conversion logic
+        throw new UnsupportedOperationException("Conversion from Date to Instant not implemented");
+    }
+
+    @Override
+    public List<java.sql.Date> listSqlDates() {
+        return getList();
+    }
+    #endif
+
+
+
+
+
+
+
+
 
     public void operation() throws YException {
     }

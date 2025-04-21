@@ -46,6 +46,7 @@ package test.openmdx.app1.layer.application;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class HardWiredObjects_2 extends AccessControl_2 {
         //
         // Creation time of the hard-wired objects
         //
-        String timestamp = org.w3c.spi2.Datatypes.BASIC_FORMATTER_DT_UTC_TZ.format(SystemClock.getInstance().now());
+        String timestamp = org.w3c.format.DateTimeFormat.BASIC_UTC_FORMAT.format(SystemClock.getInstance().now());
         //
         // hard-wired NameFormat
         //

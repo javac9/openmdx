@@ -261,7 +261,7 @@ public class PerformanceTest {
 	@BeforeAll
 	@SuppressWarnings("unchecked")
 	static public void setUp() throws ResourceException {
-		XMLGregorianCalendar today = DateStateViews.today();
+		#if CLASSIC_CHRONO_TYPES javax.xml.datatype.XMLGregorianCalendar #else java.time.LocalDate#endif today = DateStateViews.today();
 		testData = Records.getRecordFactory().createIndexedRecord(ResultRecord.class);
 		for (int i = 0; i < SIZE; i++) {
 			if (i < SIZE / 5) {

@@ -49,6 +49,7 @@
 package org.w3c.time;
 
 import javax.xml.datatype.DatatypeConstants;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
@@ -68,7 +69,6 @@ public class ChronoUtils {
     }
 
     public static String completeCentury(String value) throws ParseException, NumberFormatException {
-
         #if CLASSIC_CHRONO_TYPES
             return org.w3c.format.DateTimeFormat.completeCentury(value);
         #else
@@ -79,28 +79,25 @@ public class ChronoUtils {
         }
         return value;
         #endif
-
     }
 
     public static Number getDurationField(Duration duration, DatatypeConstants.Field field) {
+        final long durationInDays = duration.toDays();
         if (field.equals(DatatypeConstants.YEARS)) {
-            return duration.toDays() / 365;
+            return durationInDays / 365;
         } else if (field.equals(DatatypeConstants.MONTHS)) {
-            return (duration.toDays() % 365) / 30;
+            return (durationInDays % 365) / 30;
         } else if (field.equals(DatatypeConstants.DAYS)) {
-            return duration.toDays() % 30;
+            return durationInDays % 30;
         } else if (field.equals(DatatypeConstants.HOURS)) {
             return duration.toHours() % 24;
         } else if (field.equals(DatatypeConstants.MINUTES)) {
             return duration.toMinutes() % 60;
         } else if (field.equals(DatatypeConstants.SECONDS)) {
-            return duration.toMillis() / 1000 % 60;
-//            return duration.getSeconds() % 60;
-//            return duration.getSeconds();
-//            return duration.toSeconds() % 60;
-//            return (duration.toMinutes() * 60) % 60;
+            final long millis = duration.toMillis();
+            return millis % 60000 / 1000.0;
         } //else if (field.equals(DatatypeConstants.MILLISECONDS)) {
-            //return duration.toMillis() % 1000;
+        //return duration.toMillis() % 1000;
         //}
         return null;
     }

@@ -70,16 +70,36 @@ public class XImplementation
      * 
      */
     private final #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif date;
-    
+
+    #if CLASSIC_CHRONO_TYPES
     /* (non-Javadoc)
      */
-    public List<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif> getList() {
+    @Override
+    public <T extends java.util.Date> java.util.List<T> getList() {
         return Collections.singletonList(this.date);
     }
 
-	public <T extends #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant#endif> List<T> list() {
-		return (List<T>) getList();
-	}
+    @Override
+    public <T extends java.util.Date> java.util.List<T> list() {
+        return (List<T>) getList();
+    }
+    #else
+    @Override
+    public <T extends java.time.Instant> java.util.List<T> getList() {
+        return (List<T>) Collections.singletonList(this.date);
+    }
+
+    @Override
+    public <T extends java.time.Instant> java.util.List<T> list() {
+        return getList();
+    }
+
+    @Override
+    public java.util.List<java.sql.Date> listSqlDates() {
+        // Implementation for SQL Date list
+        return Collections.emptyList();  // or appropriate implementation
+    }
+    #endif
 
     public void operation() throws Exception {
     }

@@ -60,6 +60,7 @@ import org.openmdx.base.jmi1.Void;
 import org.openmdx.kernel.exception.BasicException;
 import org.w3c.cci2.SortedMaps;
 
+import org.w3c.spi2.Datatypes;
 import org.w3c.time.SystemClock;
 import test.openmdx.app1.jmi1.Address;
 import test.openmdx.app1.jmi1.App1Package;
@@ -117,7 +118,7 @@ public class PersonImpl <S extends test.openmdx.app1.jmi1.Person, N extends test
      */
     public short getAge() {
         Person same = sameObject();
-        XMLGregorianCalendar birthdate = same.getBirthdate();
+        #if CLASSIC_CHRONO_TYPES javax.xml.datatype.XMLGregorianCalendar #else java.time.LocalDate#endif birthdate = same.getBirthdate();
         if(birthdate == null) {
             return - 1;
         } else {

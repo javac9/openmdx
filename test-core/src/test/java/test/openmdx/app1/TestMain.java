@@ -830,7 +830,7 @@ public class TestMain {
 				assertFalse(ReducedJDOHelper.isPersistent(booleanProperty));
 				assertEquals("flag",  PersistenceHelper.getLastXRISegment(booleanProperty), "Transient object has already XRI qualifier");
 				this.begin();
-				refInvoices.refAdd(RefContainer.REASSIGNABLE, nextId(), invoice);
+				refInvoices.refAdd(QualifierType.REASSIGNABLE, nextId(), invoice);
 				assertNotNull(ReducedJDOHelper.getObjectId(invoice), "CR0003551");
 				for (int i = 0; i < 10; i++) {
 					InvoicePosition invoicePosition = invoicePositionClass.createInvoicePosition();
@@ -931,7 +931,7 @@ public class TestMain {
 				{
 
 					ProductQuery productQuery = (ProductQuery) entityManager.newQuery(Product.class);
-					productQuery.createdAt().lessThanOrEqualTo(SystemClock.getInstance().now());
+					productQuery.createdAt().lessThanOrEqualTo(SystemClock.getInstance().today());
 					InvoicePositionQuery invoicePositionQuery = (InvoicePositionQuery) entityManager
 							.newQuery(InvoicePosition.class);
 					invoicePositionQuery.product().elementOf(PersistenceHelper.asSubquery(productQuery));
@@ -1838,7 +1838,7 @@ public class TestMain {
 				Path xri = new Path(original.refMofId());
 				@SuppressWarnings("unchecked")
 				RefContainer<Address> container = (RefContainer<Address>) sibling.getObjectById(xri.getParent());
-				Address copy = container.refGet(RefContainer.REASSIGNABLE,
+				Address copy = container.refGet(QualifierType.REASSIGNABLE,
 						xri.getLastSegment().toClassicRepresentation());
 				assertEquals("0001",  copy.getId(), "Address.id()");
 				assertNotSame(original, copy);
@@ -2083,9 +2083,9 @@ public class TestMain {
 				this.begin();
 				person = personClass.createPerson();
 				person.setForeignId("YF");
-				#if CLASSIC_CHRONO_TYPES javax.xml.datatype.XMLGregorianCalendar #else java.time.LocalDate#endif birthDate = 
+				#if CLASSIC_CHRONO_TYPES javax.xml.datatype.XMLGregorianCalendar #else java.time.LocalDate#endif birthDate =
 						Datatypes.create(Datatypes.DATE_CLASS, "1960-01-01");
-				birthDate.setTimezone(-1);
+				#if CLASSIC_CHRONO_TYPES birthDate.setTimezone(-1)#endif;
 				person.setBirthdate(birthDate);
 				person.setBirthdateAsDateTime(Datatypes.create(Datatypes.DATE_TIME_CLASS, "19600101T120000.000Z"));
 				assertEquals("1960-01-01T12:00:00.000Z",  DateTimeFormat.EXTENDED_UTC_FORMAT.format(person.getBirthdateAsDateTime()), "Born at noon");
@@ -3206,7 +3206,7 @@ public class TestMain {
 			// get persons with filter 1
 			PersonQuery personQuery = app1Package.createPersonQuery();
 			personQuery.lastName().like("Muster1.*");
-			personQuery.birthdateAsDateTime().lessThanOrEqualTo(SystemClock.getInstance().now());
+			personQuery.birthdateAsDateTime().lessThanOrEqualTo(SystemClock.getInstance().today());
 			personQuery.orderByCreatedAt().ascending();
 			SegmentHasPerson.Person<Person> personCollection;
 			List<Person> personList;
@@ -3631,7 +3631,7 @@ public class TestMain {
 			this.begin();
 			#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif dateTimeNow = SystemClock.getInstance().now();
 			#if CLASSIC_CHRONO_TYPES javax.xml.datatype.XMLGregorianCalendar #else java.time.LocalDate#endif dateIn = Datatypes.create(Datatypes.DATE_CLASS,
-					org.w3c.spi2.Datatypes.BASIC_FORMATTER_DT_UTC_TZ.format(dateTimeNow).substring(0, 8));
+					DateTimeFormat.BASIC_UTC_FORMAT.format(dateTimeNow).substring(0, 8));
 			PersonDateOpParams personDateOpParams;
 			switch (nextStructureCreation()) {
 			case BY_MEMBER:

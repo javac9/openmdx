@@ -1,28 +1,28 @@
 /*
  * ====================================================================
  * Project:     openMDX, http://www.openmdx.org/
- * Description: DurationMarshaller 
+ * Description: DurationMarshaller
  * Owner:       the original authors.
  * ====================================================================
  *
  * This software is published under the BSD license as listed below.
- * 
+ *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright
  *   notice, this list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright
  *   notice, this list of conditions and the following disclaimer in
  *   the documentation and/or other materials provided with the
  *   distribution.
- * 
+ *
  * * Neither the name of the openMDX team nor the names of its
  *   contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -36,9 +36,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * ------------------
- * 
+ *
  * This product includes software developed by other organizations as
  * listed in the NOTICE file.
  */
@@ -46,7 +46,7 @@ package org.openmdx.base.dataprovider.layer.persistence.jdbc.datatypes;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Period;
+import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,10 +78,10 @@ public class DurationMarshaller {
 
 	/**
 	 * Factory
-	 * 
+	 *
 	 * @param durationType the duration type
-	 * 
-	 * @return an new {@code DurationMarshaller} instance
+	 *
+	 * @return a new {@code DurationMarshaller} instance
 	 * @throws ServiceException
 	 */
 	public static DurationMarshaller newInstance(String durationType) throws ServiceException {
@@ -113,28 +113,11 @@ public class DurationMarshaller {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.openmdx.compatibility.base.marshalling.Marshaller#marshal(java.lang.
 	 * Object)
 	 */
 	public Object marshal(Object source, String databaseProductName) throws ServiceException {
-		#if !CLASSIC_CHRONO_TYPES
-		if (source instanceof java.time.Period) {
-			java.time.Period period = (java.time.Period) source;
-
-			final int years = period.getYears();
-			final int months = period.getMonths();
-			boolean isNegative = years < 0 && months < 0;
-
-			StringBuilder target = new StringBuilder();
-			target.append(isNegative ? "-" : "").append("P");
-
-			target.append(isNegative ? Math.abs(years) : years).append("Y");
-			target.append(isNegative ? Math.abs(months) : months).append("M");
-
-			return target.toString();
-		}
-		#endif
 		if (Datatypes.DURATION_CLASS.isInstance(source)) {
 			Duration duration = (Duration) source;
 			ValueType valueType = ValueType.of(duration);
@@ -280,6 +263,7 @@ public class DurationMarshaller {
 					#endif
 			}
 			case NUMERIC:
+			#if CLASSIC_CHRONO_TYPES
 				switch (valueType) {
 				case YEAR_MONTH: {
 					BigInteger years = getValue(duration, DatatypeConstants.YEARS);
@@ -306,6 +290,60 @@ public class DurationMarshaller {
 				default:
 					return null;
 				}
+			#else
+				switch (valueType) {
+					case YEAR_MONTH: {
+						Long years = getValue(duration, DatatypeConstants.YEARS);
+						Long months = getValue(duration, DatatypeConstants.MONTHS);
+						long value = months + (years * MONTHS_PER_YEAR.longValue());
+						return signum < 0 ? -value : value;
+					}
+					case DAY_TIME:
+						Number daysNum = getValue(duration, DatatypeConstants.DAYS);
+						Number hoursNum = getValue(duration, DatatypeConstants.HOURS);
+						Number minutesNum = getValue(duration, DatatypeConstants.MINUTES);
+						Number secondsNum = getValue(duration, DatatypeConstants.SECONDS);
+						long days = (daysNum != null) ? daysNum.longValue() : 0L;
+						long hours = (hoursNum != null) ? hoursNum.longValue() : 0L;
+						long minutes = (minutesNum != null) ? minutesNum.longValue() : 0L;
+
+						// Handle seconds with potential fractional part
+						BigDecimal seconds;
+						if (secondsNum == null) {
+							seconds = BigDecimal.ZERO;
+						} else if (secondsNum instanceof BigDecimal) {
+							seconds = (BigDecimal) secondsNum;
+						} else {
+							seconds = new BigDecimal(secondsNum.toString());
+						}
+
+						// Calculate whole seconds part
+						long wholeSeconds = seconds.longValue();
+
+						// Calculate integer part of the value without fractional seconds
+						long integerPart = wholeSeconds
+								+ (minutes * SECONDS_PER_MINUTE.longValue())
+								+ (hours * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue())
+								+ (days * HOURS_PER_DAY.longValue() * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue());
+
+						// Get the fractional part of seconds
+						BigDecimal fractionalPart = seconds.subtract(new BigDecimal(wholeSeconds));
+
+						// Combine integer part and fractional part
+						BigDecimal result = new BigDecimal(integerPart).add(fractionalPart);
+
+						// Apply scale and sign
+						return result.setScale(PRECISION, RoundingMode.HALF_UP);
+
+					case YEAR_MONTH_DAY_TIME:
+						throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
+								BasicException.Code.TRANSFORMATION_FAILURE,
+								"A NUMERIC duration must be either a year-month or a day-time duration",
+								new BasicException.Parameter("duration", duration));
+					default:
+						return null;
+				}
+			#endif
 			case CHARACTER: {
 			#if CLASSIC_CHRONO_TYPES
 				boolean normalized = true;
@@ -376,20 +414,19 @@ public class DurationMarshaller {
 			#else
 //				boolean normalized = true;
 				boolean normalized = false;
-				Long years = getValue(duration, DatatypeConstants.YEARS);
-				Long months = getValue(duration, DatatypeConstants.MONTHS);
-				Long days = getValue(duration, DatatypeConstants.DAYS);
-				Long hours = getValue(duration, DatatypeConstants.HOURS);
-				Long minutes = getValue(duration, DatatypeConstants.MINUTES);
-				Long seconds = getValue(duration, DatatypeConstants.SECONDS);
+				Long years = getValue(duration, DatatypeConstants.YEARS).longValue();
+				Long months = getValue(duration, DatatypeConstants.MONTHS).longValue();
+				Long days = getValue(duration, DatatypeConstants.DAYS).longValue();
+				Long hours = getValue(duration, DatatypeConstants.HOURS).longValue();
+				Long minutes = getValue(duration, DatatypeConstants.MINUTES).longValue();
+				Long seconds = getValue(duration, DatatypeConstants.SECONDS).longValue();
+
 				if (seconds.compareTo(Long.valueOf(String.valueOf(SECONDS_PER_MINUTE))) > 0) {
 					normalized = false;
 					long quotient = seconds / Long.parseLong(String.valueOf(SECONDS_PER_MINUTE));
 					long remainder = seconds % Long.parseLong(String.valueOf(SECONDS_PER_MINUTE));
 					Long[] values = new Long[] { quotient, remainder };
-//					Long[] values = seconds.divideAndRemainder(SECONDS_PER_MINUTE);
 					seconds = values[1];
-//					minutes = minutes.add(values[0].toBigInteger());
 					minutes += values[0];
 				}
 				if (minutes.compareTo(Long.valueOf(String.valueOf(MINUTES_PER_HOUR))) > 0) {
@@ -397,9 +434,7 @@ public class DurationMarshaller {
 					long quotient = seconds / Long.parseLong(String.valueOf(MINUTES_PER_HOUR));
 					long remainder = seconds % Long.parseLong(String.valueOf(MINUTES_PER_HOUR));
 					Long[] values = new Long[] { quotient, remainder };
-//					Long[] values = minutes.divideAndRemainder(MINUTES_PER_HOUR);
 					minutes = values[1];
-//					hours = hours.add(values[0]);
 					hours += values[0];
 				}
 				if (hours.compareTo(Long.valueOf(String.valueOf(HOURS_PER_DAY))) > 0) {
@@ -407,9 +442,7 @@ public class DurationMarshaller {
 					long quotient = seconds / Long.parseLong(String.valueOf(HOURS_PER_DAY));
 					long remainder = seconds % Long.parseLong(String.valueOf(HOURS_PER_DAY));
 					Long[] values = new Long[] { quotient, remainder };
-//					Long[] values = hours.divideAndRemainder(HOURS_PER_DAY);
 					hours = values[1];
-//					days = days.add(values[0]);
 					days += values[0];
 				}
 				if (months.compareTo(Long.valueOf(String.valueOf(MONTHS_PER_YEAR))) > 0) {
@@ -417,51 +450,42 @@ public class DurationMarshaller {
 					long quotient = seconds / Long.parseLong(String.valueOf(MONTHS_PER_YEAR));
 					long remainder = seconds % Long.parseLong(String.valueOf(MONTHS_PER_YEAR));
 					Long[] values = new Long[] { quotient, remainder };
-//					Long[] values = months.divideAndRemainder(MONTHS_PER_YEAR);
 					months = values[1];
-//					years = years.add(values[0]);
 					years += values[0];
 				}
 				if (normalized) {
 					return duration.toString();
 				} else {
-
 					StringBuilder target = new StringBuilder(signum < 0 ? "-" : "");
 					target.append("P");
 
-//					switch (valueType) {
-//					case ValueType.YEAR_MONTH:
-//						return years + "-" + months;
-//					case ValueType.DAY_TIME:
-//						return days + " " + hours + ":" + minutes + ":" + seconds;
+					boolean outputDaysUnit = false;
+					switch (valueType) {
+						case YEAR_MONTH: {
+							break;
+						}
+						case DAY_TIME: {
+							break;
+						}
+						case YEAR_MONTH_DAY_TIME: {
+							break;
+						}
+						default:
+					}
+
+					// fixes some, breaks others....
+//					if (duration.toString().equals("PT0S")) {
+//						target.append("T");
+//						processSeconds(signum, duration, seconds, target);
+//						return target.toString();
 //					}
 
-					if (valueType != ValueType.DAY_TIME) {
-						if (years > 0) {
-							target.append(years).append("Y");
-						}
-						if (months > 0) {
-							target.append(months).append("M");
-						}
-					} else {
-						target.append(this.appendUnit(duration, days, "D"));
-						target.append("T");
-						target.append(this.appendUnit(duration, hours, "H"));
-						target.append(this.appendUnit(duration, minutes, "M"));
-						target.append(seconds);
-						if (seconds == 0 || duration.toString().contains(".")) {
-							int nanos = duration.getNano();
-							int millis = nanos / 1_000_000;
-							if (signum < 0) {
-								millis = 1000 + (signum * millis);
-							}
-							if (nanos >= 0) {
-								// Get milliseconds (first 3 digits of nanos)
-								target.append(".").append(String.format("%03d", millis));
-							}
-						}
-						target.append("S");
-					}
+					target.append(this.appendUnit(duration, days, "D"));
+
+					target.append("T");
+					target.append(this.appendUnit(duration, hours, "H"));
+					target.append(this.appendUnit(duration, minutes, "M"));
+					processSeconds(signum, duration, seconds, target);
 
 					if (signum < 0) {
 						// The first character is already a "-", we want to keep that
@@ -471,7 +495,6 @@ public class DurationMarshaller {
 						result = result.charAt(0) + result.substring(1).replace("-", "");
 						return result;
 					}
-
 					return target.toString();
 				}
 			#endif
@@ -480,38 +503,72 @@ public class DurationMarshaller {
 				return null;
 			}
 		}#if !CLASSIC_CHRONO_TYPES else if (source instanceof java.time.Period) {
-			final java.time.Period period = (java.time.Period) source;
-			// Check if the period is negative
-			boolean isNegative = period.isNegative();
+
+			java.time.Period period = (java.time.Period) source;
+
+			boolean isNormalized = (period.getMonths() % MONTHS_PER_YEAR.intValue() == 0 && period.getYears() != 0);
+			if (!isNormalized) {
+				period = period.normalized();
+			}
+
+			final int years = period.getYears();
+			final int months = period.getMonths();
+			boolean isNegative = years < 0 && months < 0;
 
 			StringBuilder result = new StringBuilder();
+			result.append(isNegative ? "-" : "").append("P");
 
-			// Add the negative sign at the beginning for a negative period
-			if (isNegative) {
-				result.append('-');
+			boolean outputYearsIfNotZero = false;
+			switch (durationType) {
+				case CHARACTER: {
+					outputYearsIfNotZero = true;
+					break;
+				}
+				case INTERVAL: {
+					outputYearsIfNotZero = true;
+					break;
+				}
+				case NUMERIC: {
+					if (period.toString().length() == 3) {
+						return new BigInteger(period.toString().replaceAll("[^0-9]", ""));
+					} else {
+						final BigInteger n = BigInteger.valueOf((long) extractYears(period.toString()) * MONTHS_PER_YEAR.intValue() + extractMonths(period.toString()));
+						return period.isNegative() ? n.negate() : n;
+					}
+				}
+				default:
 			}
 
-			result.append('P');
-
-			// Use absolute values for each component
-			int years = Math.abs(period.getYears());
-			int months = Math.abs(period.getMonths());
-
-			if (years > 0) {
-				result.append(years).append('Y');
+			if (outputYearsIfNotZero && years != 0) {
+				result.append(isNegative ? Math.abs(years) : years).append("Y");
 			}
 
-			if (months > 0) {
-				result.append(months).append('M');
-			}
+			result.append(isNegative ? Math.abs(months) : months).append("M");
 
 			return result.toString();
+
 		}#endif else {
 			return source;
 		}
 	}
 
-	private String appendUnit(Object source, Long val, String unit) {
+	private void processSeconds(int signum, Duration duration, long seconds, StringBuilder target) {
+		target.append(seconds);
+		if (seconds == 0 || duration.toString().contains(".")) {
+			int nanos = duration.getNano();
+			int millis = nanos / 1_000_000;
+			if (signum < 0) {
+				millis = 1000 + (signum * millis);
+			}
+			if (nanos >= 0) {
+				// Get milliseconds (first 3 digits of nanos)
+				target.append(".").append(String.format("%03d", millis));
+			}
+		}
+		target.append("S");
+	}
+
+	private String appendUnit(Object source, Number val, String unit) {
 		final String src = source.toString();
 		if (src.contains("PT") && !src.contains(unit)) {
 			return val + unit;
@@ -521,7 +578,7 @@ public class DurationMarshaller {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.openmdx.compatibility.base.marshalling.Marshaller#unmarshal(java.lang.
 	 * Object)
@@ -532,7 +589,15 @@ public class DurationMarshaller {
 		} else {
 			switch (durationType) {
 			case CHARACTER:
-				return Datatypes.create(Datatypes.DURATION_CLASS, source.toString());
+				#if CLASSIC_CHRONO_TYPES return Datatypes.create(Datatypes.DURATION_CLASS, source.toString())
+				#else
+					final String src = source.toString();
+					if (src.contains("T") || src.contains("D")) {
+						return Datatypes.DATATYPE_FACTORY.newDuration(src);
+					} else {
+						return Datatypes.DATATYPE_FACTORY.newPeriod(!src.startsWith("-"), extractYears(src), extractMonths(src));
+					}
+				#endif
 			case INTERVAL: {
 				if(PGIntervalMarshaller.isApplicableForDataType(source)) {
 					return PG_INTERVAL_MARSHALLER.unmarshal(source);
@@ -583,10 +648,15 @@ public class DurationMarshaller {
 			case NUMERIC: {
 				if (source instanceof Number) {
 					Number value = (Number) source;
-					return source instanceof BigDecimal && ((BigDecimal) source).scale() > 0
-							? toDuration("T", value, "S")
-							: toDuration("", value, "M");
-//					return java.time.Period.(((Number) source).intValue());
+					return #if CLASSIC_CHRONO_TYPES
+						if (source instanceof BigDecimal && ((BigDecimal) source).scale() > 0) {
+							toDuration("T", value, "S")
+						}
+					#else
+						source.toString().contains(".")
+								? toDuration("T", value, "S")
+								: java.time.Period.ofMonths(value.intValue())
+					#endif;
 				} else
 					throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
 							BasicException.Code.TRANSFORMATION_FAILURE,
@@ -606,6 +676,20 @@ public class DurationMarshaller {
 		String value = infix.toString();
 		return Datatypes.create(Datatypes.DURATION_CLASS, value.charAt(0) == '-' ? ("-P" + prefix + value.substring(1) + suffix)
 				: ("P" + prefix + value + suffix));
+	}
+
+	private static int extractYears(String src) {
+		if (src == null || src.isEmpty()) return 0;
+		Pattern pattern = Pattern.compile("(\\d+)Y");
+		Matcher matcher = pattern.matcher(src);
+		return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
+	}
+
+	private static int extractMonths(String src) {
+		if (src == null || src.isEmpty()) return 0;
+		Pattern pattern = Pattern.compile("(\\d+)M");
+		Matcher matcher = pattern.matcher(src);
+		return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
 	}
 
 	// ------------------------------------------------------------------------

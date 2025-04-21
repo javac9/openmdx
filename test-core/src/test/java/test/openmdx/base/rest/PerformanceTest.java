@@ -327,13 +327,13 @@ public class PerformanceTest {
                     out.writeUTF("identity");
                     out.writeUTF(v.identity);
                     out.writeUTF("field1");
-                    out.writeLong(v.field1.getTime());
+                    out.writeLong(v.field1#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeUTF("field2");
                     out.writeInt(v.field2.size());
                     for (Iterator<String> k = v.field2.iterator(); k.hasNext();)
                         out.writeUTF(k.next());
                     out.writeUTF("field3");
-                    out.writeLong(v.field3.getTime());
+                    out.writeLong(v.field3#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeUTF("field4");
                     out.writeInt(v.field4.size());
                     for (Iterator<String> k = v.field4.iterator(); k.hasNext();)
@@ -427,13 +427,13 @@ public class PerformanceTest {
                     out.writeUTF("identity");
                     out.writeUTF(v.getIdentity());
                     out.writeUTF("field1");
-                    out.writeLong(v.getField1().getTime());
+                    out.writeLong(v.getField1()#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeUTF("field2");
                     out.writeInt(v.getField2().size());
                     for (Iterator<String> k = v.getField2().iterator(); k.hasNext();)
                         out.writeUTF(k.next());
                     out.writeUTF("field3");
-                    out.writeLong(v.getField3().getTime());
+                    out.writeLong(v.getField3()#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeUTF("field4");
                     out.writeInt(v.getField4().size());
                     for (Iterator<String> k = v.getField4().iterator(); k.hasNext();)
@@ -589,14 +589,14 @@ public class PerformanceTest {
                         out.writeUTF("identity");
                         out.writeUTF((String) g0.invoke(v, (Object[]) null));
                         out.writeUTF("field1");
-                        out.writeUTF(dateFormat.format((Date) g1.invoke(v, (Object[]) null))); // Datatypes.DATE_TIME_CLASS.cast(g1.invoke(v, (Object[]) null))
+                        out.writeUTF(dateFormat.format(Datatypes.DATE_TIME_CLASS.cast(g1.invoke(v, (Object[]) null)))); // Datatypes.DATE_TIME_CLASS.cast(g1.invoke(v, (Object[]) null))
                         out.writeUTF("field2");
                         Set<String> f2 = (Set<String>) g2.invoke(v, (Object[]) null);
                         out.writeUTF(String.valueOf(f2.size()));
                         for (Iterator<String> k = f2.iterator(); k.hasNext();)
                             out.writeUTF(k.next());
                         out.writeUTF("field3");
-                        out.writeUTF(dateFormat.format((Date) g3.invoke(v, (Object[]) null)));
+                        out.writeUTF(dateFormat.format(Datatypes.DATE_TIME_CLASS.cast(g3.invoke(v, (Object[]) null))));
                         out.writeUTF("field4");
                         Set<String> f4 = (Set<String>) g4.invoke(v, (Object[]) null);
                         out.writeUTF(String.valueOf(f4.size()));
@@ -691,12 +691,12 @@ public class PerformanceTest {
                             out.writeUTF(p.getSegment(k).toClassicRepresentation());
                         ValueObject v = e.getValue();
                         out.writeUTF(v.getIdentity());
-                        out.writeLong(v.getField1().getTime());
+                        out.writeLong(v.getField1()#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                         Set<String> f2 = v.getField2();
                         out.writeInt(f2.size());
                         for (Iterator<String> k = f2.iterator(); k.hasNext();)
                             out.writeUTF(k.next());
-                        out.writeLong(v.getField3().getTime());
+                        out.writeLong(v.getField3()#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                         Set<String> f4 = v.getField4();
                         out.writeInt(f4.size());
                         for (Iterator<String> k = f4.iterator(); k.hasNext();)
@@ -770,11 +770,11 @@ public class PerformanceTest {
                         out.writeUTF(p.getSegment(k).toClassicRepresentation());
                     ValueObject v = e.getValue();
                     out.writeUTF(v.identity);
-                    out.writeLong(v.field1.getTime());
+                    out.writeLong(v.field1#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeInt(v.field2.size());
                     for (Iterator<String> k = v.field2.iterator(); k.hasNext();)
                         out.writeUTF(k.next());
-                    out.writeLong(v.field3.getTime());
+                    out.writeLong(v.field3#if CLASSIC_CHRONO_TYPES .getTime() #else .toEpochMilli()#endif);
                     out.writeInt(v.field4.size());
                     for (Iterator<String> k = v.field4.iterator(); k.hasNext();)
                         out.writeUTF(k.next());
