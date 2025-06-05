@@ -44,7 +44,7 @@
  */
 package org.openmdx.base.rest.cci;
 
-import #if JAVA_8 javax.resource.cci.Connection #else jakarta.resource.cci.Connection #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.Connection;
 import org.openmdx.base.resource.cci.ConnectionFactory;
 
 /**

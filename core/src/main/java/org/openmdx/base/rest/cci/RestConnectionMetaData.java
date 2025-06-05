@@ -44,7 +44,7 @@
  */
 package org.openmdx.base.rest.cci;
 
-import #if JAVA_8 javax.resource.cci.ConnectionMetaData #else jakarta.resource.cci.ConnectionMetaData #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.ConnectionMetaData;
 
 /**
  * REST Connection Meta Data

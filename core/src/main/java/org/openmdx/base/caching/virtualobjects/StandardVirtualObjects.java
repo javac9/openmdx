@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.cache.integration.CacheLoaderException;
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.openmdx.base.accessor.rest.spi.ObjectRecords;
 import org.openmdx.base.naming.Path;

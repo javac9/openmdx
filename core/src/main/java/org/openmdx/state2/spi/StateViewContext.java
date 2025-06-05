@@ -44,7 +44,7 @@
  */
 package org.openmdx.state2.spi;
 
-import #if JAVA_8 javax.resource.cci.InteractionSpec #else jakarta.resource.cci.InteractionSpec #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.InteractionSpec;
 
 import org.openmdx.state2.cci.StateContext;
 import org.openmdx.state2.cci.ViewKind;

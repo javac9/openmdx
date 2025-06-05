@@ -45,7 +45,7 @@
 package org.openmdx.base.accessor.jmi.cci;
 
 import javax.jmi.reflect.RefStruct;
-import #if JAVA_8 javax.resource.cci.Record #else jakarta.resource.cci.Record #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.Record;
 
 /**
  * This interface extends the javax.jmi.reflect.RefStruct interface by openMDX

@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.openmdx.application.mof.externalizer.cci.ModelExternalizer_1_0;
 import org.openmdx.application.mof.externalizer.spi.*;

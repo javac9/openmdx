@@ -81,19 +81,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
-#if JAVA_8
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 #else
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-#endif
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
-import javax.servlet.http.HttpSessionContext;
-#else
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.Interaction;
 import jakarta.servlet.AsyncContext;
@@ -111,9 +108,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
 #endif
@@ -879,7 +873,7 @@ public class ServletPort
                 public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) {
                     throw new UnsupportedOperationException();
                 }
-                #if JAVA_8 #else
+                #if !JAVA_8
 				@Override
 				public String getRequestId() {
                     throw new UnsupportedOperationException();

@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import #if JAVA_8 javax.servlet.http.HttpServletResponse #else jakarta.servlet.http.HttpServletResponse #endif;
+import #if JAVA_8 javax#else jakarta#endif.servlet.http.HttpServletResponse;
 
 import org.omg.mof.spi.Identifier;
 import org.openmdx.base.exception.ServiceException;

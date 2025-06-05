@@ -51,7 +51,7 @@ import java.util.Map;
 import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
 import javax.jmi.reflect.RefObject;
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.omg.mof.spi.Names;
 import org.openmdx.application.xml.spi.ImportMode;

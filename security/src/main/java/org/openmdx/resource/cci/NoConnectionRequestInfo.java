@@ -44,7 +44,7 @@
  */
 package org.openmdx.resource.cci;
 
-import #if JAVA_8 javax.resource.spi.ConnectionRequestInfo #else jakarta.resource.spi.ConnectionRequestInfo #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.spi.ConnectionRequestInfo;
 
 public final class NoConnectionRequestInfo implements ConnectionRequestInfo {
 

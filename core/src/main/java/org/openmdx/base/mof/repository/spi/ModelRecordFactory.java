@@ -47,7 +47,7 @@ package org.openmdx.base.mof.repository.spi;
 
 import java.util.Optional;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 /**
  * ModelRecordFactory

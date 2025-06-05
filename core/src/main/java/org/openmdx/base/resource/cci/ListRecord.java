@@ -44,7 +44,7 @@
  */
 package org.openmdx.base.resource.cci;
 
-import #if JAVA_8 javax.resource.cci.IndexedRecord #else jakarta.resource.cci.IndexedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.IndexedRecord;
 
 
 /**

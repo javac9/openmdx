@@ -45,7 +45,7 @@ package org.openmdx.base.accessor.rest.spi;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

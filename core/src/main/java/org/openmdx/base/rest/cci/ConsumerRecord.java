@@ -44,7 +44,7 @@
  */
 package org.openmdx.base.rest.cci;
 
-import #if JAVA_8 javax.resource.cci.Record #else jakarta.resource.cci.Record #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.Record;
 
 import java.util.function.Consumer;
 

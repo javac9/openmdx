@@ -46,7 +46,7 @@ package org.openmdx.kernel.lightweight.naming;
 
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
-import #if JAVA_8 javax.transaction.TransactionSynchronizationRegistry #else jakarta.transaction.TransactionSynchronizationRegistry #endif;
+import #if JAVA_8 javax#else jakarta#endif.transaction.TransactionSynchronizationRegistry;
 import org.openmdx.kernel.lightweight.naming.jdbc.AbstractDataSourceContext;
 import org.openmdx.kernel.lightweight.naming.jdbc.AtomikosDataSourceContext;
 import com.atomikos.icatch.jta.TransactionSynchronizationRegistryImp;

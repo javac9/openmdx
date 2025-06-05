@@ -51,7 +51,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.openmdx.base.marshalling.TypeSafeMarshaller;
 import org.openmdx.base.mof.repository.cci.AssociationRecord;

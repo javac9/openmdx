@@ -46,7 +46,7 @@ package org.openmdx.base.rest.cci;
 
 import java.util.UUID;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 /**
  * {@code org::openmdx::kernel::Object}
