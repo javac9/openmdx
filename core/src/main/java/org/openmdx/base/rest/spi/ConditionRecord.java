@@ -46,7 +46,7 @@ package org.openmdx.base.rest.spi;
 
 import java.util.EnumSet;
 
-import #if JAVA_8 javax.resource.cci.IndexedRecord #else jakarta.resource.cci.IndexedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.IndexedRecord;
 
 import org.openmdx.base.mof.cci.Multiplicity;
 import org.openmdx.base.query.ConditionType;

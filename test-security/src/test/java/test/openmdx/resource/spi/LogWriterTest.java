@@ -44,7 +44,7 @@
  */
 package test.openmdx.resource.spi;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.junit.jupiter.api.Test;
 import org.openmdx.resource.spi.LogWriter;

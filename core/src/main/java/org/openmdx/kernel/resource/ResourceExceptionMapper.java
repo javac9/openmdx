@@ -44,7 +44,7 @@
  */
 package org.openmdx.kernel.resource;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.openmdx.kernel.exception.BasicException;
 

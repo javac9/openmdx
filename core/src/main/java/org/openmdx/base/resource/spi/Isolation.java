@@ -44,7 +44,7 @@
  */
 package org.openmdx.base.resource.spi;
 
-import #if JAVA_8 javax.resource.cci.Record #else jakarta.resource.cci.Record #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.Record;
 
 import org.openmdx.base.resource.cci.Freezable;
 import org.openmdx.kernel.exception.BasicException;

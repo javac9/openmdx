@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import #if JAVA_8 javax.servlet.http.HttpSession #else jakarta.servlet.http.HttpSession#endif;
+import #if JAVA_8 javax#else jakarta#endif.servlet.http.HttpSession;
 
 import org.openmdx.portal.servlet.component.ObjectView;
 

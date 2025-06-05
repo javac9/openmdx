@@ -55,7 +55,7 @@ import java.util.TimeZone;
 
 import javax.jdo.PersistenceManager;
 import javax.jmi.reflect.RefStruct;
-import #if JAVA_8 javax.servlet.http.HttpSession #else jakarta.servlet.http.HttpSession#endif;
+import #if JAVA_8 javax#else jakarta#endif.servlet.http.HttpSession;
 
 import org.openmdx.base.accessor.jmi.cci.RefObject_1_0;
 import org.openmdx.base.exception.ServiceException;

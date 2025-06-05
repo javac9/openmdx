@@ -1,6 +1,6 @@
 package org.openmdx.base.rest.spi;
 
-import #if JAVA_8 javax.resource.cci.ResourceAdapterMetaData #else jakarta.resource.cci.ResourceAdapterMetaData #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.ResourceAdapterMetaData;
 
 import org.openmdx.base.Version;
 import org.openmdx.base.resource.spi.RestInteractionSpec;

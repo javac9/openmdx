@@ -46,7 +46,7 @@
 package org.openmdx.base.dataprovider.layer.persistence.jdbc;
 
 import javax.jdo.FetchPlan;
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.openmdx.base.dataprovider.layer.persistence.jdbc.spi.Database_2_0;
 import org.openmdx.base.exception.ServiceException;

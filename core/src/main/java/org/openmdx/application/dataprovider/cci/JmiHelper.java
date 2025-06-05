@@ -55,7 +55,7 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jmi.reflect.RefObject;
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.openmdx.base.accessor.cci.SystemAttributes;
 import org.openmdx.base.accessor.jmi.cci.RefPackage_1_0;

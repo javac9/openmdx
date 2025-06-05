@@ -77,7 +77,7 @@ import javax.jdo.PersistenceManager;
 import javax.jmi.reflect.RefBaseObject;
 import javax.jmi.reflect.RefObject;
 import javax.jmi.reflect.RefPackage;
-import #if JAVA_8 javax.resource.cci.InteractionSpec #else jakarta.resource.cci.InteractionSpec #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.InteractionSpec;
 
 import org.oasisopen.cci2.QualifierType;
 import org.oasisopen.jmi1.RefContainer;

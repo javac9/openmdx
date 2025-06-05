@@ -46,7 +46,7 @@ package org.openmdx.base.resource;
 
 import java.io.ObjectStreamException;
 
-import #if JAVA_8 javax.resource.cci.InteractionSpec #else jakarta.resource.cci.InteractionSpec #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.InteractionSpec;
 
 import org.openmdx.base.resource.cci.RestFunction;
 import org.openmdx.base.resource.spi.MethodInvocationSpec;

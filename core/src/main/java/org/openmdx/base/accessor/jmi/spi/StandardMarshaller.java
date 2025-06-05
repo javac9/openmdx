@@ -53,7 +53,7 @@ import java.util.Set;
 import javax.jdo.spi.PersistenceCapable;
 import javax.jmi.reflect.RefBaseObject;
 import javax.jmi.reflect.RefObject;
-import #if JAVA_8 javax.resource.cci.Record #else jakarta.resource.cci.Record #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.Record;
 
 import org.oasisopen.jmi1.RefContainer;
 import org.openmdx.base.accessor.jmi.cci.RefStruct_1_0;

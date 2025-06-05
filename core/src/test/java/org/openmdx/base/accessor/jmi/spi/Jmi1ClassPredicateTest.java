@@ -46,7 +46,7 @@ package org.openmdx.base.accessor.jmi.spi;
 
 import java.util.function.Predicate;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

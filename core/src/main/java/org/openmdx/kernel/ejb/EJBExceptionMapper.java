@@ -44,7 +44,7 @@
  */
 package org.openmdx.kernel.ejb;
 
-import #if JAVA_8 javax.ejb.EJBException #else jakarta.ejb.EJBException #endif;
+import #if JAVA_8 javax#else jakarta#endif.ejb.EJBException;
 
 import org.openmdx.kernel.exception.BasicException;
 

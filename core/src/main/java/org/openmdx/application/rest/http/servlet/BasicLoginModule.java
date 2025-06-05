@@ -44,7 +44,7 @@
  */
 package org.openmdx.application.rest.http.servlet;
 
-import #if JAVA_8 javax.resource.cci.ConnectionSpec #else jakarta.resource.cci.ConnectionSpec #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.ConnectionSpec;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;

@@ -47,7 +47,7 @@ package org.openmdx.base.accessor.rest.spi;
 
 import java.util.Arrays;
 
-import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.ResourceException;
 
 import org.openmdx.base.naming.Path;
 import org.openmdx.base.resource.Records;

@@ -46,7 +46,7 @@ package org.openmdx.base.rest.cci;
 
 import java.util.List;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.openmdx.base.accessor.jmi.cci.RefQuery_1_0;
 import org.w3c.cci2.AnyTypePredicate;

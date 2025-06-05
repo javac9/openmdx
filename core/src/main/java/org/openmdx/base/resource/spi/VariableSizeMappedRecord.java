@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.openmdx.base.resource.cci.Freezable;
 import org.openmdx.kernel.collection.InternalizedKeyMap;

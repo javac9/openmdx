@@ -48,7 +48,7 @@ import java.util.AbstractList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import #if JAVA_8 javax.resource.cci.IndexedRecord #else jakarta.resource.cci.IndexedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.IndexedRecord;
 
 import org.openmdx.kernel.text.MultiLineStringRepresentation;
 import org.openmdx.kernel.text.format.IndentingFormatter;

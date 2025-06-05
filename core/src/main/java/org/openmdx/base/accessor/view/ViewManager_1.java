@@ -69,7 +69,7 @@ import javax.jdo.Transaction;
 import javax.jdo.datastore.JDOConnection;
 import javax.jdo.datastore.Sequence;
 import javax.jdo.listener.InstanceLifecycleListener;
-import #if JAVA_8 javax.resource.cci.InteractionSpec #else jakarta.resource.cci.InteractionSpec #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.InteractionSpec;
 
 import org.openmdx.application.mof.cci.ModelAttributes;
 import org.openmdx.base.accessor.cci.DataObjectManager_1_0;

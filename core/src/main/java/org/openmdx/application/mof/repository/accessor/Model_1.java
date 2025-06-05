@@ -59,7 +59,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import #if JAVA_8 javax#else jakarta#endif.resource.cci.MappedRecord;
 
 import org.openmdx.base.accessor.cci.DataObject_1_0;
 import org.openmdx.base.accessor.cci.Structure_1_0;
