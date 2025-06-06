@@ -170,11 +170,11 @@ abstract class ElementRecord<M extends Enum<M>>
         return this.objectId;
     }
 
-    protected #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif getCreatedAt(){
+    protected java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif getCreatedAt(){
         return this.createdAt == NULL_DATE_TIME ? null : ChronoTypes.ofEpochMilliseconds(this.createdAt);
     }
 
-    protected void setCreatedAt(#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif createdAt){
+    protected void setCreatedAt(java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif createdAt){
         assertMutability();
         this.createdAt = createdAt == null ? NULL_DATE_TIME : ChronoTypes.getEpochMilliseconds(createdAt);
     }
@@ -212,11 +212,11 @@ abstract class ElementRecord<M extends Enum<M>>
         this.createdBy = internalize(firstOfSet(createdBy));
     }
     
-    protected #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif getModifiedAt(){
+    protected java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif getModifiedAt(){
         return this.modifiedAt == NULL_DATE_TIME ? null : ChronoTypes.ofEpochMilliseconds(this.modifiedAt);
     }
 
-    protected void setModifiedAt(#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif modifiedAt){
+    protected void setModifiedAt(java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif modifiedAt){
         assertMutability();
         this.modifiedAt = modifiedAt == null ? NULL_DATE_TIME : ChronoTypes.getEpochMilliseconds(modifiedAt);
     }

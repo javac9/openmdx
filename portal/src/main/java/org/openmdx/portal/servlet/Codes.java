@@ -113,8 +113,8 @@ public final class Codes implements Serializable {
 			String iconKey,
 			String color,
 			String backColor,
-			#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif validFrom,
-			#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif validTo
+			java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif validFrom,
+			java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif validTo
 		) {
 			this.id = id;
 			this.shortText = shortText;

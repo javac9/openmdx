@@ -2190,7 +2190,7 @@ public class TestMain {
 				person.setBirthdate(birthDate);
 				person.setBirthdateAsDateTime(Datatypes.create(Datatypes.DATE_TIME_CLASS, "19600101T120000.000Z"));
 				assertEquals(
-					#if CLASSIC_CHRONO_TYPES  "1960-01-01T12:00:00.000Z" #else "1960-01-01T12:00:00Z" #endif,
+					#if CLASSIC_CHRONO_TYPES "1960-01-01T12:00:00.000Z" #else "1960-01-01T12:00:00Z" #endif,
 					DateTimeFormat.EXTENDED_UTC_FORMAT.format(person.getBirthdateAsDateTime()), "Born at noon");
 				person.setLastName("MusterX");
 				person.setSalutation("Herr");

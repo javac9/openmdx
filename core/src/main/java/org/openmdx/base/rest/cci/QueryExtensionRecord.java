@@ -141,7 +141,7 @@ public interface QueryExtensionRecord extends MappedRecord {
      * Retrieves a list containing all the elements for the attribute {@code dateTimeParam}.
      * @return A list containing all elements for this attribute.
      */
-    java.util.List<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif> getDateTimeParam(
+    java.util.List<java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif> getDateTimeParam(
     );
 
     /**
@@ -156,11 +156,11 @@ public interface QueryExtensionRecord extends MappedRecord {
      * @param dateTimeParam value(s) to be added to {@code dateTimeParam}
      */
     void setDateTimeParam(
-        #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif... dateTimeParam
+        java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif... dateTimeParam
     );
 
     void setDateTimeParam(
-        java.util.List<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif> dateTimeParam
+        java.util.List<java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif> dateTimeParam
     );
 
     /**

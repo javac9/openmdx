@@ -59,7 +59,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Period;
 import java.util.Locale;
-import #if CLASSIC_CHRONO_TYPES javax.xml.datatype.Duration #else java.time.Duration #endif;
+import #if CLASSIC_CHRONO_TYPES javax.xml.datatype#else java.time#endif.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -186,38 +186,55 @@ public class DurationMarshaller {
             ValueType valueType = ValueType.of(duration);
             if (valueType == null)
                 return null;
-            final int signum = duration#if CLASSIC_CHRONO_TYPES .getSign() #else .isNegative() ? -1 : (duration.isZero() ? 0 : 1)#endif ;
+            final int signum = duration#if CLASSIC_CHRONO_TYPES .getSign() #else .isNegative() ? -1 : (duration.isZero() ? 0 : 1)#endif;
+
+            #if CLASSIC_CHRONO_TYPES
+            final int absYears = Math.abs(getValue(duration, DatatypeConstants.YEARS).intValue());
+            final int absMonths = Math.abs(getValue(duration, DatatypeConstants.MONTHS).intValue());
+            final int absDays = Math.abs(getValue(duration, DatatypeConstants.DAYS).intValue());
+            final int absHours = Math.abs(getValue(duration, DatatypeConstants.HOURS).intValue());
+            final int absMinutes = Math.abs(getValue(duration, DatatypeConstants.MINUTES).intValue());
+            #else
+            final Long absYears = Math.abs(getValue(duration, DatatypeConstants.YEARS).longValue());
+            final Long absMonths = Math.abs(getValue(duration, DatatypeConstants.MONTHS).longValue());
+            final Long absDays = Math.abs(getValue(duration, DatatypeConstants.DAYS).longValue());
+            final Long absHours = Math.abs(getValue(duration, DatatypeConstants.HOURS).longValue());
+            final Long absMinutes = Math.abs(getValue(duration, DatatypeConstants.MINUTES).longValue());
+            #endif
+
+            #if CLASSIC_CHRONO_TYPES BigInteger #else Long#endif years =
+                    #if CLASSIC_CHRONO_TYPES BigInteger.valueOf(absYears) #else absYears #endif;
+            #if CLASSIC_CHRONO_TYPES BigInteger #else Long#endif months =
+                    #if CLASSIC_CHRONO_TYPES BigInteger.valueOf(absMonths) #else absMonths #endif;
+            #if CLASSIC_CHRONO_TYPES BigInteger #else Long#endif days =
+                    #if CLASSIC_CHRONO_TYPES BigInteger.valueOf(absDays) #else absDays #endif;
+            #if CLASSIC_CHRONO_TYPES BigInteger #else Long#endif hours =
+                    #if CLASSIC_CHRONO_TYPES BigInteger.valueOf(absHours) #else absHours #endif;
+            #if CLASSIC_CHRONO_TYPES BigInteger #else Long#endif minutes =
+                    #if CLASSIC_CHRONO_TYPES BigInteger.valueOf(absMinutes) #else absMinutes #endif;
+
             switch (durationType) {
                 case INTERVAL: {
-					#if CLASSIC_CHRONO_TYPES
-					if(PGIntervalMarshaller.isApplicableForDatabaseProduct(databaseProductName)) {
+					if (PGIntervalMarshaller.isApplicableForDatabaseProduct(databaseProductName)) {
 						switch (valueType) {
 							case YEAR_MONTH: {
-								BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-								BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
 								return PG_INTERVAL_MARSHALLER.marshal(signum, years.intValue(), months.intValue(), 0, 0, 0, 0);
 							}
 							case DAY_TIME: {
-								BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-								BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-								BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
-								BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
-								return PG_INTERVAL_MARSHALLER.marshal(
-									signum, 
-									0, 
-									0, 
-									days.intValue(), 
-									hours.intValue(), 
-									minutes.intValue(), 
-									seconds.doubleValue()
-								);
-							}
+                                BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS) instanceof BigDecimal ?
+                                        getValue(duration, DatatypeConstants.SECONDS) :
+                                        new BigDecimal(getValue(duration, DatatypeConstants.SECONDS).toString());
+                                return PG_INTERVAL_MARSHALLER.marshal(
+                                    signum,
+                                    0,
+                                    0,
+                                    days.intValue(),
+                                    hours.intValue(),
+                                    minutes.intValue(),
+                                    seconds.doubleValue()
+                                );
+                            }
 							case YEAR_MONTH_DAY_TIME:
-								BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-								BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-								BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-								BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-								BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
 								BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
 								return PG_INTERVAL_MARSHALLER.marshal(
 									signum, 
@@ -239,19 +256,14 @@ public class DurationMarshaller {
 					} else {
 						final StringBuilder target = new StringBuilder(signum < 0 ? "-" : "");
 						switch (valueType) {
-							case YEAR_MONTH: {
-								BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-								BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-								return target.append(years).append("-").append(months).toString();
-							}
-							case DAY_TIME: {
-								BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-								BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-								BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
-								Number seconds = getValue(duration, DatatypeConstants.SECONDS);
-								return target.append(days).append(" ").append(hours).append(":").append(minutes).append(":")
-										.append(seconds).toString();
-							}
+                            case YEAR_MONTH: {
+                                return target.append(years).append("-").append(months).toString();
+                            }
+                            case DAY_TIME: {
+                                Number seconds = Math.abs(getValue(duration, DatatypeConstants.SECONDS).doubleValue());
+                                return target.append(days).append(" ").append(hours).append(":").append(minutes).append(":")
+                                        .append(String.format(Locale.US, "%.3f", seconds)).toString();
+                            }
 							case YEAR_MONTH_DAY_TIME:
 								throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
 										BasicException.Code.TRANSFORMATION_FAILURE,
@@ -267,132 +279,35 @@ public class DurationMarshaller {
 								);
 						}
 					}
-					#else
-                    if (PGIntervalMarshaller.isApplicableForDatabaseProduct(databaseProductName)) {
-                        switch (valueType) {
-                            case YEAR_MONTH: {
-                                BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-                                BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-                                return PG_INTERVAL_MARSHALLER.marshal(signum, years.intValue(), months.intValue(), 0, 0, 0, 0);
-                            }
-                            case DAY_TIME: {
-                                BigInteger days = BigInteger.valueOf(getValue(duration, DatatypeConstants.DAYS));
-                                BigInteger hours = BigInteger.valueOf(getValue(duration, DatatypeConstants.HOURS));
-                                BigInteger minutes = BigInteger.valueOf(getValue(duration, DatatypeConstants.MINUTES));
-                                BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS) instanceof BigDecimal ?
-                                        getValue(duration, DatatypeConstants.SECONDS) :
-                                        new BigDecimal(getValue(duration, DatatypeConstants.SECONDS).toString());
-                                return PG_INTERVAL_MARSHALLER.marshal(
-                                        signum,
-                                        0,
-                                        0,
-                                        days.intValue(),
-                                        hours.intValue(),
-                                        minutes.intValue(),
-                                        seconds.doubleValue()
-                                );
-                            }
-                            case YEAR_MONTH_DAY_TIME:
-                                BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-                                BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-                                BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-                                BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-                                BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
-                                BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
-                                return PG_INTERVAL_MARSHALLER.marshal(
-                                        signum,
-                                        years.intValue(),
-                                        months.intValue(),
-                                        days.intValue(),
-                                        hours.intValue(),
-                                        minutes.intValue(),
-                                        seconds.doubleValue()
-                                );
-                            default:
-                                throw new RuntimeServiceException(
-                                        BasicException.Code.DEFAULT_DOMAIN,
-                                        BasicException.Code.ASSERTION_FAILURE,
-                                        "Unsupported value type",
-                                        new BasicException.Parameter("durationType", durationType),
-                                        new BasicException.Parameter("valueType", valueType)
-                                );
-                        }
-                    } else {
-                        final StringBuilder target = new StringBuilder(signum < 0 ? "-" : "");
-                        switch (valueType) {
-                            case YEAR_MONTH: {
-								#if CLASSIC_CHRONO_TYPES BigInteger #else
-                                Long#endif years = Math.abs(getValue(duration, DatatypeConstants.YEARS)#if !CLASSIC_CHRONO_TYPES .longValue()#endif );
-								#if CLASSIC_CHRONO_TYPES BigInteger #else
-                                Long#endif months = Math.abs(getValue(duration, DatatypeConstants.MONTHS)#if !CLASSIC_CHRONO_TYPES .longValue()#endif );
-                                return target.append(years).append("-").append(months).toString();
-                            }
-                            case DAY_TIME: {
-								#if CLASSIC_CHRONO_TYPES BigInteger #else
-                                Long#endif days = Math.abs(getValue(duration, DatatypeConstants.DAYS)#if !CLASSIC_CHRONO_TYPES .longValue()#endif );
-								#if CLASSIC_CHRONO_TYPES BigInteger #else
-                                Long#endif hours = Math.abs(getValue(duration, DatatypeConstants.HOURS)#if !CLASSIC_CHRONO_TYPES .longValue()#endif );
-								#if CLASSIC_CHRONO_TYPES BigInteger #else
-                                Long#endif minutes = Math.abs(getValue(duration, DatatypeConstants.MINUTES)#if !CLASSIC_CHRONO_TYPES .longValue()#endif );
-                                Number seconds = Math.abs(getValue(duration, DatatypeConstants.SECONDS).doubleValue());
-                                return target.append(days).append(" ").append(hours).append(":").append(minutes).append(":")
-                                        .append(String.format(Locale.US, "%.3f", seconds)).toString();
-                            }
-                            case YEAR_MONTH_DAY_TIME:
-                                throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
-                                        BasicException.Code.TRANSFORMATION_FAILURE,
-                                        "An INTERVAL duration must be either a year-month or a day-time duration",
-                                        new BasicException.Parameter("duration", duration));
-                            default:
-                                throw new RuntimeServiceException(
-                                        BasicException.Code.DEFAULT_DOMAIN,
-                                        BasicException.Code.ASSERTION_FAILURE,
-                                        "Unsupported value type",
-                                        new BasicException.Parameter("durationType", durationType),
-                                        new BasicException.Parameter("valueType", valueType)
-                                );
-                        }
-                    }
-					#endif
                 }
                 case NUMERIC:
                     switch (valueType) {
                         case YEAR_MONTH: {
-					#if CLASSIC_CHRONO_TYPES
-					BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-					BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-					BigInteger value = months.add(years.multiply(MONTHS_PER_YEAR));
-					return signum < 0 ? value.negate() : value;
-					#else
-                            Long years = getValue(duration, DatatypeConstants.YEARS);
-                            Long months = getValue(duration, DatatypeConstants.MONTHS);
+                            #if CLASSIC_CHRONO_TYPES
+        					BigInteger value = months.add(years.multiply(MONTHS_PER_YEAR));
+                            return signum < 0 ? value.negate() : value;
+                            #else
                             long value = months + (years * MONTHS_PER_YEAR.longValue());
                             return signum < 0 ? -value : value;
-					#endif
+                            #endif
                         }
                         case DAY_TIME:
-					#if CLASSIC_CHRONO_TYPES
-					BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-					BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-					BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
-					BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
-					BigDecimal value = seconds.add(
-							new BigDecimal(
-									minutes.add(hours.add(days.multiply(HOURS_PER_DAY)).multiply(MINUTES_PER_HOUR))
-							).multiply(SECONDS_PER_MINUTE)
-					);
-					return signum < 0 ? value.negate() : value;
-					#else
+                            BigDecimal seconds;
+					        #if CLASSIC_CHRONO_TYPES
+                            seconds = getValue(duration, DatatypeConstants.SECONDS);
+                            BigDecimal value = seconds.add(
+                                    new BigDecimal(
+                                            minutes.add(hours.add(days.multiply(HOURS_PER_DAY)).multiply(MINUTES_PER_HOUR))
+                                    ).multiply(SECONDS_PER_MINUTE)
+                            );
+                            return signum < 0 ? value.negate() : value;
+					        #else
                             Number daysNum = getValue(duration, DatatypeConstants.DAYS);
                             Number hoursNum = getValue(duration, DatatypeConstants.HOURS);
                             Number minutesNum = getValue(duration, DatatypeConstants.MINUTES);
                             Number secondsNum = getValue(duration, DatatypeConstants.SECONDS);
-                            long days = (daysNum != null) ? daysNum.longValue() : 0L;
-                            long hours = (hoursNum != null) ? hoursNum.longValue() : 0L;
-                            long minutes = (minutesNum != null) ? minutesNum.longValue() : 0L;
 
-                            // Handle seconds with potential fractional part
-                            BigDecimal seconds;
+                            // Handle seconds with a potential fractional part
                             if (secondsNum == null) {
                                 seconds = BigDecimal.ZERO;
                             } else if (secondsNum instanceof BigDecimal) {
@@ -404,11 +319,14 @@ public class DurationMarshaller {
                             // Calculate whole seconds part
                             long wholeSeconds = seconds.longValue();
 
-                            // Calculate integer part of the value without fractional seconds
+                            // Calculate the integer part of the value without fractional seconds
+                            long d = (daysNum != null) ? daysNum.longValue() : 0L;
+                            long h = (hoursNum != null) ? hoursNum.longValue() : 0L;
+                            long m = (minutesNum != null) ? minutesNum.longValue() : 0L;
                             long integerPart = wholeSeconds
-                                    + (minutes * SECONDS_PER_MINUTE.longValue())
-                                    + (hours * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue())
-                                    + (days * HOURS_PER_DAY.longValue() * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue());
+                                    + (m * SECONDS_PER_MINUTE.longValue())
+                                    + (h * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue())
+                                    + (d * HOURS_PER_DAY.longValue() * MINUTES_PER_HOUR.longValue() * SECONDS_PER_MINUTE.longValue());
 
                             // Get the fractional part of seconds
                             BigDecimal fractionalPart = seconds.subtract(new BigDecimal(wholeSeconds));
@@ -418,8 +336,7 @@ public class DurationMarshaller {
 
                             // Apply scale and sign
                             return result.setScale(PRECISION, RoundingMode.HALF_UP);
-
-					#endif
+					        #endif
                         case YEAR_MONTH_DAY_TIME:
                             throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
                                     BasicException.Code.TRANSFORMATION_FAILURE,
@@ -435,94 +352,88 @@ public class DurationMarshaller {
                             );
                     }
                 case CHARACTER: {
-			#if CLASSIC_CHRONO_TYPES
-			    if(valueType == null) {
-					return null;
-			    }
-				BigInteger years = getValue(duration, DatatypeConstants.YEARS);
-				BigInteger months = getValue(duration, DatatypeConstants.MONTHS);
-				BigInteger days = getValue(duration, DatatypeConstants.DAYS);
-				BigInteger hours = getValue(duration, DatatypeConstants.HOURS);
-				BigInteger minutes = getValue(duration, DatatypeConstants.MINUTES);
-				BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
-				if (seconds.compareTo(SECONDS_PER_MINUTE) > 0) {
-					BigDecimal[] values = seconds.divideAndRemainder(SECONDS_PER_MINUTE);
-					seconds = values[1];
-					minutes = minutes.add(values[0].toBigInteger());
-				}
-				if (minutes.compareTo(MINUTES_PER_HOUR) > 0) {
-					BigInteger[] values = minutes.divideAndRemainder(MINUTES_PER_HOUR);
-					minutes = values[1];
-					hours = hours.add(values[0]);
-				}
-				if (hours.compareTo(HOURS_PER_DAY) > 0) {
-					BigInteger[] values = hours.divideAndRemainder(HOURS_PER_DAY);
-					hours = values[1];
-					days = days.add(values[0]);
-				}
-				if (months.compareTo(MONTHS_PER_YEAR) > 0) {
-					BigInteger[] values = months.divideAndRemainder(MONTHS_PER_YEAR);
-					months = values[1];
-					years = years.add(values[0]);
-				}
-				StringBuilder target = new StringBuilder(signum < 0 ? "-P" : "P");
-				switch(valueType) {
-					case YEAR_MONTH:
-						return target
-							.append(years)
-							.append("Y")
-							.append(months)
-							.append("M")
-							.toString();
-					case DAY_TIME:
-						return target
-							.append(days)
-							.append("DT")
-							.append(hours)
-							.append("H")
-							.append(minutes)
-							.append("M")
-							.append(seconds)
-							.append("S")
-							.toString();
-					case YEAR_MONTH_DAY_TIME:
-						final boolean time =
-							hours.signum() != 0 ||
-							minutes.signum() != 0 ||
-							seconds.signum() != 0;
-						return (
-							time ? target
-								.append(years)
-								.append("Y")
-								.append(months)
-								.append("M")
-								.append(days)
-								.append("DT")
-								.append(hours)
-								.append("H")
-								.append(minutes)
-								.append("M")
-								.append(seconds)
-								.append("S") :
-							target
-								.append(years)
-								.append("Y")
-								.append(months)
-								.append("M")
-								.append(days)
-								.append("D")
-							).toString();
-						default:
-							throw new RuntimeServiceException(
-								BasicException.Code.DEFAULT_DOMAIN,
-								BasicException.Code.ASSERTION_FAILURE,
-								"Unsupported value type",
-								new BasicException.Parameter("durationType", durationType),
-								new BasicException.Parameter("valueType", valueType)
-							);
-				}
-			#else
-                    final StringBuilder target = new StringBuilder(duration.isNegative() ? "-P" : "P");
+                    StringBuilder target = new StringBuilder(signum < 0 ? "-P" : "P");
+			        #if CLASSIC_CHRONO_TYPES
+                    if(valueType == null) {
+                        return null;
+                    }
+                    BigDecimal seconds = getValue(duration, DatatypeConstants.SECONDS);
+                    if (seconds.compareTo(SECONDS_PER_MINUTE) > 0) {
+                        BigDecimal[] values = seconds.divideAndRemainder(SECONDS_PER_MINUTE);
+                        seconds = values[1];
+                        minutes = minutes.add(values[0].toBigInteger());
+                    }
+                    if (minutes.compareTo(MINUTES_PER_HOUR) > 0) {
+                        BigInteger[] values = minutes.divideAndRemainder(MINUTES_PER_HOUR);
+                        minutes = values[1];
+                        hours = hours.add(values[0]);
+                    }
+                    if (hours.compareTo(HOURS_PER_DAY) > 0) {
+                        BigInteger[] values = hours.divideAndRemainder(HOURS_PER_DAY);
+                        hours = values[1];
+                        days = days.add(values[0]);
+                    }
+                    if (months.compareTo(MONTHS_PER_YEAR) > 0) {
+                        BigInteger[] values = months.divideAndRemainder(MONTHS_PER_YEAR);
+                        months = values[1];
+                        years = years.add(values[0]);
+                    }
+                    switch(valueType) {
+                        case YEAR_MONTH:
+                            return target
+                                .append(years)
+                                .append("Y")
+                                .append(months)
+                                .append("M")
+                                .toString();
+                        case DAY_TIME:
+                            return target
+                                .append(days)
+                                .append("DT")
+                                .append(hours)
+                                .append("H")
+                                .append(minutes)
+                                .append("M")
+                                .append(seconds)
+                                .append("S")
+                                .toString();
+                        case YEAR_MONTH_DAY_TIME:
+                            final boolean time =
+                                hours.signum() != 0 ||
+                                minutes.signum() != 0 ||
+                                seconds.signum() != 0;
+                            return (
+                                time ? target
+                                    .append(years)
+                                    .append("Y")
+                                    .append(months)
+                                    .append("M")
+                                    .append(days)
+                                    .append("DT")
+                                    .append(hours)
+                                    .append("H")
+                                    .append(minutes)
+                                    .append("M")
+                                    .append(seconds)
+                                    .append("S") :
+                                target
+                                    .append(years)
+                                    .append("Y")
+                                    .append(months)
+                                    .append("M")
+                                    .append(days)
+                                    .append("D")
+                                ).toString();
+                            default:
+                                throw new RuntimeServiceException(
+                                    BasicException.Code.DEFAULT_DOMAIN,
+                                    BasicException.Code.ASSERTION_FAILURE,
+                                    "Unsupported value type",
+                                    new BasicException.Parameter("durationType", durationType),
+                                    new BasicException.Parameter("valueType", valueType)
+                                );
+                    }
+                    #else
                     final Duration absolute = duration.isNegative() ? duration.negated() : duration;
                     target
                             .append(absolute.toDays())
@@ -547,7 +458,7 @@ public class DurationMarshaller {
                         target.append('.').append(fraction, 0, digits);
                     }
                     return target.append("S").toString();
-			#endif
+			        #endif
                 }
                 default:
                     throw new RuntimeServiceException(
@@ -627,7 +538,6 @@ public class DurationMarshaller {
                         return source instanceof BigDecimal && ((BigDecimal) source).scale() > 0
                                 ? toDuration("T", value, "S")
                                 : toDuration("", value, "M");
-//					return java.time.Period.(((Number) source).intValue());
                     } else
                         throw new ServiceException(BasicException.Code.DEFAULT_DOMAIN,
                                 BasicException.Code.TRANSFORMATION_FAILURE,
@@ -656,7 +566,7 @@ public class DurationMarshaller {
     /**
      * The type used to store {@code org::w3c::duration} values
      */
-    static enum DurationType {
+    enum DurationType {
 
         /**
          * {@code INTERVAL} <i>(domain defined by the database field definition)

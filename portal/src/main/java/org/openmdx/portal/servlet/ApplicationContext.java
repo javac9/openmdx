@@ -1206,7 +1206,7 @@ public final class ApplicationContext implements Serializable {
      * Get time when pm data was last reloaded.
      * @return
      */
-    public #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif getPmDataReloadedAt(
+    public java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif getPmDataReloadedAt(
     ) {
         return this.pmDataReloadedAt;
     }
@@ -2097,7 +2097,7 @@ public final class ApplicationContext implements Serializable {
 	protected String currentLoginPrincipal;
 	protected String currentUserRole;
 	protected PersistenceManager pmData; // package managing data objects
-	protected #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif pmDataReloadedAt;
+	protected java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif pmDataReloadedAt;
 	protected PersistenceManager pmControl; // package managing control objects
 	protected String currentLocaleAsString = null;
 	protected String currentTimeZone = null;

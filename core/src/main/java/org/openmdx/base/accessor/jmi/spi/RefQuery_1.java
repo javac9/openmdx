@@ -1903,7 +1903,7 @@ public class RefQuery_1 implements RefQuery_1_0 {
                     qualifiedName) : PrimitiveTypes.STRING.equals(typeName) ? new RefStringTypePredicate(
                         quantifier,
                         qualifiedName)
-                        : PrimitiveTypes.DATETIME.equals(typeName) ? new RefComparableTypePredicate<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant#endif>(
+                        : PrimitiveTypes.DATETIME.equals(typeName) ? new RefComparableTypePredicate<java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant#endif>(
                             quantifier,
                             qualifiedName)
                             : PrimitiveTypes.DECIMAL.equals(typeName) ? new RefComparableTypePredicate<BigDecimal>(

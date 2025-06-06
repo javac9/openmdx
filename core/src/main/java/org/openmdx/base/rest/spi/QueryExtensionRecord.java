@@ -182,7 +182,7 @@ public class QueryExtensionRecord
      */
 	@SuppressWarnings("unchecked")
     @Override
-    public List<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif> getDateTimeParam() {
+    public List<java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif> getDateTimeParam() {
     	if(this.dateTimeParam == null) {
     		this.dateTimeParam = newList();
     	}
@@ -277,12 +277,12 @@ public class QueryExtensionRecord
      * @see org.openmdx.base.query.Extension#setDateTimeParam(java.util.Date[])
      */
     @Override
-    public void setDateTimeParam(#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif... dateTimeParam) {
+    public void setDateTimeParam(java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif... dateTimeParam) {
     	replaceValues(getDateTimeParam(), dateTimeParam);
     }
 
 	@Override
-	public void setDateTimeParam(List<#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif> dateTimeParam) {
+	public void setDateTimeParam(List<java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif> dateTimeParam) {
 		replaceValues(getDateTimeParam(), dateTimeParam);
 	}
 

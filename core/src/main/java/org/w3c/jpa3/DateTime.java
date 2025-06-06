@@ -41,7 +41,7 @@ public class DateTime {
      * 
      * @return the corresponding org::w3c::dateTime value
      */
-    public static final #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif toCCI (
+    public static final java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif toCCI (
         java.sql.Timestamp jdoDateTime
     ){
         return jdoDateTime == null ? null : #if CLASSIC_CHRONO_TYPES new java.util.Date(jdoDateTime.getTime()); #else jdoDateTime.toInstant(); #endif

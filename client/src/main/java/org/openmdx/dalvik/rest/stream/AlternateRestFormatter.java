@@ -564,7 +564,7 @@ public class AlternateRestFormatter implements RestFormatter {
                 writer.writeStartElement("element");
                 writer.writeAttribute("exceptionDomain", entry.getExceptionDomain());
                 writer.writeAttribute("exceptionCode", String.valueOf(entry.getExceptionCode()));
-                #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif exceptionTime = entry.getTimestamp();
+                java.#if CLASSIC_CHRONO_TYPES util.Date #else time.Instant #endif exceptionTime = entry.getTimestamp();
                 if (exceptionTime != null) {
                     writer.writeAttribute(
                         "exceptionTime",
