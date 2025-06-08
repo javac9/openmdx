@@ -67,6 +67,7 @@ import java.net.URLDecoder;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -299,7 +300,7 @@ public class DefaultPortalExtension implements PortalExtension_1_0, Serializable
 				case SelectViewportAction.EVENT_ID:
 					return new SelectViewportAction();
 				case UiGridMoveDownObjectAction.EVENT_ID:
-					return new UiGridMoveDownObjectAction();				
+					return new UiGridMoveDownObjectAction();
 				case UiGridMoveUpObjectAction.EVENT_ID:
 					return new UiGridMoveUpObjectAction();
 				case UiGetOperationDialogAction.EVENT_ID:
@@ -1859,7 +1860,7 @@ public class DefaultPortalExtension implements PortalExtension_1_0, Serializable
 									for(Iterator<String> j = newValues.iterator(); j.hasNext(); ) {
 										try {
 											String newValue = j.next();
-											#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif dateTime = null;
+											#if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif dateTime;
 											try {
 												dateTime = dateTimeParser.parse(newValue)#if !CLASSIC_CHRONO_TYPES .toInstant()#endif;
 											} catch(ParseException e) {
@@ -1868,18 +1869,7 @@ public class DefaultPortalExtension implements PortalExtension_1_0, Serializable
 											if(dateTime != null) {
 												cal.setTime(#if CLASSIC_CHRONO_TYPES dateTime #else Date.from(dateTime) #endif);
 												if(PrimitiveTypes.DATE.equals(featureTypeName)) {
-													#if CLASSIC_CHRONO_TYPES
-													final java.util.GregorianCalendar calendar = new java.util.GregorianCalendar();
-													javax.xml.datatype.XMLGregorianCalendar date = org.w3c.spi.DatatypeFactories.xmlDatatypeFactory().newXMLGregorianCalendarDate(
-														calendar.get(java.util.Calendar.YEAR),
-														calendar.get(java.util.Calendar.MONTH) + 1,
-														calendar.get(java.util.Calendar.DAY_OF_MONTH),
-														javax.xml.datatype.DatatypeConstants.FIELD_UNDEFINED
-													);
-													#else
-													java.time.LocalDate date = java.time.LocalDate.now();
-													#endif
-													mappedNewValues.add(date);
+													mappedNewValues.add(LocalDate.now());
 												} else if(PrimitiveTypes.DATETIME.equals(featureTypeName)) {
 													mappedNewValues.add(dateTime);
 												} else {

@@ -365,7 +365,7 @@ public final class Codes implements Serializable {
 		        }
 		        this.pm = pm;
 				this.codeContainers = codeContainers;
-				this.refreshedAt = System.currentTimeMillis();				
+				this.refreshedAt = System.currentTimeMillis();
 			}
 			CodeContainer codeContainer = this.codeContainers.get(name);
 			return codeContainer == null
