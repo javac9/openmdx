@@ -398,7 +398,7 @@ public abstract class AbstractSparseArray<E> implements SparseArray<E> {
     public ListIterator<E> populationIterator() {
         return new ListIterator<E>() {
 
-            private final List<Integer> list = new ArrayList<Integer>(keySet());
+            private final List<Integer> list = new ArrayList<>(keySet());
             private final ListIterator<Integer> iterator = list.listIterator();
 
             Integer current = null;
@@ -614,7 +614,7 @@ public abstract class AbstractSparseArray<E> implements SparseArray<E> {
      * A list backed up by the sparse array:
      * <ul>
      * <li>its size() is the sparse array's {@code lastKey() + 1}
-     * <li>the sparse array's un-populated positions are represented as {@code null</null> values
+     * <li>the sparse array's unpopulated positions are represented as {@code null</null> values
      * <li>get() and set() operations are allowed for any index >= 0
      * <li>clear() and add(E) are supported
      * <li>remove(int) and add(int,E) are not supported

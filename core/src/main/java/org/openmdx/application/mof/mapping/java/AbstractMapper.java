@@ -232,10 +232,11 @@ public abstract class AbstractMapper extends MapperTemplate {
             JavaExportFormat javaExportFormat = this.format.isJPA3() ? JavaExportFormat.CCI2 : this.format;
             String javaType = this.getClassType(classDef).getType(
                 classDef,
-                    javaExportFormat,
+                javaExportFormat,
                 featureUsage
             );
-            return multiValued ? qualified(collectionClass,qualifiedTypeName,false) + '<' + javaType + amendment + '>' : javaType;
+            String type = configuration.chronoFlavour.isClassic() ? javaType + amendment : "T";
+            return multiValued ? qualified(collectionClass,qualifiedTypeName,false) + "<" + type + ">" : javaType;
         } else {
             String javaType = this.interfaceType(
                 qualifiedTypeName,

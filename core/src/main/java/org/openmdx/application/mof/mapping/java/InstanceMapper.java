@@ -45,6 +45,7 @@ package org.openmdx.application.mof.mapping.java;
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,6 +69,7 @@ import org.openmdx.application.mof.mapping.java.metadata.FieldMetaData;
 import org.openmdx.application.mof.mapping.java.metadata.Visibility;
 import org.openmdx.application.mof.mapping.spi.MapperUtils;
 import org.openmdx.base.accessor.cci.SystemAttributes;
+import org.openmdx.base.cci2.BasicObject;
 import org.openmdx.base.exception.ServiceException;
 import org.openmdx.base.mof.cci.ModelElement_1_0;
 import org.openmdx.base.mof.cci.Model_1_0;
@@ -766,9 +768,19 @@ extends AbstractClassMapper {
         if(this.format.isJPA3()) {
             printLine("  @Override");
         }
-        printLine("  public ", this.getReturnType(operationDef), " ", this.getMethodName(operationDef.getName()), "(");
         int ii = 0;
         for(StructuralFeatureDef param: operationDef.getParameters()) {
+            if (ii == 0) {
+                ModelElement_1_0 paramElement = model.getElement(param.getQualifiedTypeName());
+                printLine(
+                        "  public ",
+                        configuration.chronoFlavour.isClassic() && (paramElement.isPrimitiveType() || paramElement.isStructureType()) ? "" :
+                                        "<T extends " + this.getType(param.getQualifiedTypeName(), this.format, false) + "> ",
+                        this.getReturnType(operationDef),
+                        " ",
+                        this.getMethodName(operationDef.getName()),
+                        "(");
+            }
             if(!VoidRecord.NAME.equals(param.getQualifiedTypeName())) {
                 String separator = ii == 0
                 ? "      "
