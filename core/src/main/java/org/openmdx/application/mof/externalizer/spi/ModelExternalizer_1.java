@@ -150,7 +150,7 @@ public class ModelExternalizer_1 implements ModelExternalizer_1_0 {
 		request.setResourceIdentifier(modelPackagePath.getChild("externalizePackage"));
 		request.setBody(params);
 		MessageRecord result = channnel.addOperationRequest(request);
-		return (byte[]) result.getBody().get("packageAsJar");
+		return (byte[]) ((MappedRecord)result.getBody()).get("packageAsJar");
 	}
 
 	/**

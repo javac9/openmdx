@@ -104,6 +104,7 @@ import org.openmdx.base.accessor.cci.SystemAttributes;
 import org.openmdx.base.accessor.jmi.cci.RefObject_1_0;
 import org.openmdx.base.accessor.jmi.cci.RefPackage_1_0;
 import org.openmdx.base.accessor.jmi.cci.RefStruct_1_0;
+import org.openmdx.base.accessor.jmi.spi.RefPackage_1;
 import org.openmdx.base.accessor.jmi.spi.ReferenceDef;
 import org.openmdx.base.exception.ServiceException;
 import org.openmdx.base.mof.cci.ModelElement_1_0;
@@ -1303,11 +1304,15 @@ public class InboundConnection_2 extends AbstractConnection {
                     final int featurePosition = xri.size() - (xri.isObjectPath() ? 2 : 1);
                     RefObject refObject = getObjectByResourceIdentifier(xri.getPrefix(featurePosition));
                     RefPackage_1_0 refPackage = (RefPackage_1_0) refObject.refOutermostPackage();
-                    MappedRecord arguments = input.getBody();
+                    Record arguments = input.getBody();
                     Object reply = refObject.refInvokeOperation(
                         xri.getSegment(
                             featurePosition
-                        ).toClassicRepresentation(), Collections.singletonList(refPackage.refCreateStruct(arguments))
+                        ).toClassicRepresentation(), Collections.singletonList(
+                                #if CLASSIC_CHRONO_TYPES refPackage.refCreateStruct(arguments)
+                                #else ((RefPackage_1)refPackage).refCreateList((IndexedRecord) arguments)
+                                #endif
+                            )
                     );
                     if (output != null) {
                         output.setResourceIdentifier(xri);

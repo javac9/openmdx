@@ -63,11 +63,13 @@ import java.util.concurrent.ConcurrentMap;
 import javax.resource.ResourceException;
 import javax.resource.cci.IndexedRecord;
 import javax.resource.cci.MappedRecord;
+import javax.resource.cci.Record;
 import javax.resource.spi.ResourceAllocationException;
 #else
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.IndexedRecord;
 import jakarta.resource.cci.MappedRecord;
+import jakarta.resource.cci.Record;
 import jakarta.resource.spi.ResourceAllocationException;
 #endif
 import javax.xml.stream.XMLOutputFactory;
@@ -695,14 +697,14 @@ public class StandardRestFormatter implements RestFormatter {
      * Format Record
      */
     private static void formatRecord(
-        RestTarget target,
-        int indent,
-        Path xri,
-        String id,
-        byte[] version,
-        Object index, 
-        MappedRecord record,
-        boolean serializeNulls
+            RestTarget target,
+            int indent,
+            Path xri,
+            String id,
+            byte[] version,
+            Object index,
+            #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif record,
+            boolean serializeNulls
     ) throws ResourceException {
     	try {
 			printRecord(
@@ -739,14 +741,14 @@ public class StandardRestFormatter implements RestFormatter {
      */
     @SuppressWarnings("unchecked")
     private static void printRecord(
-        RestTarget target,
-        int indent,
-        Path xri,
-        String id,
-        byte[] version,
-        Object index, 
-        MappedRecord record,
-        boolean serializeNulls
+            RestTarget target,
+            int indent,
+            Path xri,
+            String id,
+            byte[] version,
+            Object index,
+            #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif record,
+            boolean serializeNulls
     ) throws XMLStreamException{
         XMLStreamWriter writer = target.getWriter();
         String tag = record.getRecordName().replace(':', '.');
@@ -763,7 +765,8 @@ public class StandardRestFormatter implements RestFormatter {
         if (index != null) {
             writer.writeAttribute("index", index.toString());
         }
-        Set<Map.Entry<String, ?>> entries = record.entrySet();
+        #if CLAASSIC_CHRONO_TYPES
+        Set<Map.Entry> entries = record.entrySet();
         for (Map.Entry<String, ?> entry : entries) {
             String feature = entry.getKey();
             Object value = entry.getValue();
@@ -794,6 +797,83 @@ public class StandardRestFormatter implements RestFormatter {
             }
         }
         target.getWriter().writeEndElement(); // tag
+
+        #else
+
+        if (record instanceof MappedRecord) {
+
+            Set<Map.Entry> entries = ((MappedRecord)record).entrySet();
+            for (Map.Entry<String, ?> entry : entries) {
+                String feature = entry.getKey();
+                Object value = entry.getValue();
+                try {
+                    printValue(
+                            target,
+                            indent,
+                            xri,
+                            feature,
+                            value,
+                            isAnyType(record.getRecordName(), feature),
+                            serializeNulls
+                    );
+                } catch (Exception exception) {
+                    SysLog.warning(
+                            "Collection element print failure",
+                            new ServiceException(
+                                    exception,
+                                    BasicException.Code.DEFAULT_DOMAIN,
+                                    BasicException.Code.PROCESSING_FAILURE,
+                                    "Unable to retrieve feature value",
+                                    new BasicException.Parameter("hrefContext", target.getBase()),
+                                    new BasicException.Parameter(BasicException.Parameter.XRI, xri),
+                                    new BasicException.Parameter("id", id),
+                                    new BasicException.Parameter("feature", feature)
+                            )
+                    );
+                }
+            }
+            target.getWriter().writeEndElement(); // tag
+
+        } else if (record instanceof IndexedRecord) {
+
+            IndexedRecord indexedRecord = (IndexedRecord) record;
+            for (int i = 0; i < indexedRecord.size(); i++) {
+                Object value = indexedRecord.get(i);
+                String feature = String.valueOf(i); // Use index as feature name, or define a proper naming strategy
+
+                try {
+                    printValue(
+                        target,
+                        indent,
+                        xri,
+                        feature,
+                        value,
+                        isAnyType(record.getRecordName(), feature),
+                        serializeNulls
+                    );
+                } catch (Exception exception) {
+                    SysLog.warning(
+                        "Collection element print failure",
+                        new ServiceException(
+                            exception,
+                            BasicException.Code.DEFAULT_DOMAIN,
+                            BasicException.Code.PROCESSING_FAILURE,
+                            "Unable to retrieve feature value",
+                            new BasicException.Parameter("hrefContext", target.getBase()),
+                            new BasicException.Parameter(BasicException.Parameter.XRI, xri),
+                            new BasicException.Parameter("id", id),
+                            new BasicException.Parameter("feature", feature)
+                        )
+                    );
+                }
+            }
+            target.getWriter().writeEndElement(); // tag
+
+
+        }
+
+        #endif
+
     }
 
 	/**

@@ -62,6 +62,7 @@ import java.util.concurrent.ConcurrentMap;
 import #if JAVA_8 javax.resource.ResourceException #else jakarta.resource.ResourceException #endif;
 import #if JAVA_8 javax.resource.cci.IndexedRecord #else jakarta.resource.cci.IndexedRecord #endif;
 import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
+import jakarta.resource.cci.Record;
 import #if JAVA_8 javax.resource.spi.ResourceAllocationException #else jakarta.resource.spi.ResourceAllocationException #endif;
 
 import org.ietf.jgss.Oid;
@@ -667,14 +668,14 @@ public class AlternateRestFormatter implements RestFormatter {
      * Format Record
      */
     private static void formatRecord(
-        RestTarget target,
-        int indent,
-        Path xri,
-        String id,
-        byte[] version,
-        Object index, 
-        MappedRecord record,
-        boolean serializeNulls
+            RestTarget target,
+            int indent,
+            Path xri,
+            String id,
+            byte[] version,
+            Object index,
+            #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif record,
+            boolean serializeNulls
     ) throws ResourceException {
     	try {
 			printRecord(
@@ -711,14 +712,14 @@ public class AlternateRestFormatter implements RestFormatter {
      */
     @SuppressWarnings("unchecked")
     private static void printRecord(
-        RestTarget target,
-        int indent,
-        Path xri,
-        String id,
-        byte[] version,
-        Object index, 
-        MappedRecord record,
-        boolean serializeNulls
+            RestTarget target,
+            int indent,
+            Path xri,
+            String id,
+            byte[] version,
+            Object index,
+            Record record,
+            boolean serializeNulls
     ) throws XMLStreamException{
         XMLStreamWriter writer = target.getWriter();
         String tag = record.getRecordName().replace(':', '.');
@@ -735,7 +736,7 @@ public class AlternateRestFormatter implements RestFormatter {
         if (index != null) {
             writer.writeAttribute("index", index.toString());
         }
-        Set<Map.Entry<String, ?>> entries = record.entrySet();
+        Set<Map.Entry> entries = record.entrySet();
         for (Map.Entry<String, ?> entry : entries) {
             String feature = entry.getKey();
             Object value = entry.getValue();

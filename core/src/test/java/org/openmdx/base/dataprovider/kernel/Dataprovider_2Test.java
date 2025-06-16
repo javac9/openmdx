@@ -47,10 +47,12 @@ package org.openmdx.base.dataprovider.kernel;
 #if JAVA_8
 import javax.resource.ResourceException;
 import javax.resource.cci.Interaction;
+import javax.resource.cci.MappedRecord;
 import javax.resource.cci.Record;
 #else
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.Interaction;
+import jakarta.resource.cci.MappedRecord;
 import jakarta.resource.cci.Record;
 #endif
 
@@ -78,7 +80,7 @@ public class Dataprovider_2Test {
 		// Assert
 		Assertions.assertTrue(reply instanceof MessageRecord);
 		MessageRecord message = (MessageRecord) reply;
-		final Object greetings = message.getBody().get("greetings");
+		final Object greetings = #if CLASSIC_CHRONO_TYPES message.getBody() #else ((MappedRecord)message.getBody())#endif.get("greetings");
 		Assertions.assertEquals("Hello world!", greetings);
 	}
 	

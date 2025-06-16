@@ -115,7 +115,7 @@ public class MessageRecord
     /**
      * The {@code "body"} entry
      */
-    private MappedRecord body = VoidRecord.getInstance();
+    private #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif body = VoidRecord.getInstance();
 
 	/* (non-Javadoc)
 	 * @see org.openmdx.base.rest.spi.AbstractMappedRecord#makeImmutable()
@@ -139,7 +139,7 @@ public class MessageRecord
      * @see org.openmdx.base.rest.cci.MessageRecord#getBody()
      */
     @Override
-    public MappedRecord getBody() {
+    public #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif getBody() {
         return this.body;
     }
 
@@ -155,7 +155,7 @@ public class MessageRecord
      * @see org.openmdx.base.rest.cci.MessageRecord#setBody(javax.resource.cci.MappedRecord)
      */
     @Override
-    public void setBody(MappedRecord body) {
+    public void setBody(#if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif body) {
     	assertMutability();
         this.body = body == null ? VoidRecord.getInstance() : body;
     }

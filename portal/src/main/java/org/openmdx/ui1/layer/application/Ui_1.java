@@ -66,10 +66,12 @@ import java.util.TreeMap;
 import javax.resource.ResourceException;
 import javax.resource.cci.Interaction;
 import javax.resource.cci.MappedRecord;
+import javax.resource.cci.Record;
 #else
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.Interaction;
 import jakarta.resource.cci.MappedRecord;
+import jakarta.resource.cci.Record;
 #endif
 
 import org.openmdx.base.accessor.cci.SystemAttributes;
@@ -3295,11 +3297,11 @@ public class Ui_1 extends AbstractRestPort {
 	    ) throws ResourceException {
     		Path requestPath = input.getResourceIdentifier();
 	        String operationName = requestPath.getSegment(requestPath.size() - 2).toClassicRepresentation();
-	        MappedRecord body = input.getBody();
+	        #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif body = input.getBody();
 	        if("assertInspector".equals(operationName)) {
 	            try {
 	                Path segmentIdentity = requestPath.getPrefix(5);
-	                String forClass = (String)body.get("forClass");
+	                String forClass = (String) ((MappedRecord)body).get("forClass");
 	                MappedRecord inspectorDef = null;
                     inspectorDef = this.retrieveObject(
                         segmentIdentity.getDescendant(new String[]{"element", forClass})
@@ -3337,7 +3339,7 @@ public class Ui_1 extends AbstractRestPort {
 	            } catch(Exception e) {
 					throw ResourceExceptions.initHolder(
 						new ResourceException(
-		                    "Inspector for class " + body.get("forClass") + " can not be created",
+		                    "Inspector for class " + ((MappedRecord)body).get("forClass") + " can not be created",
 							BasicException.newEmbeddedExceptionStack(
 			                    e,
 			                    BasicException.Code.DEFAULT_DOMAIN,

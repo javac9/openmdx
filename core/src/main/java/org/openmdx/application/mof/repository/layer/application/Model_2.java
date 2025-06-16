@@ -862,7 +862,7 @@ public class Model_2 extends AbstractRestPort {
 			    new ModelConstraintsChecker_2(model.getRepository()).verify();
                 try(ByteArrayOutputStream bs = new ByteArrayOutputStream()){
     			    try(ZipOutputStream zip = new ZipOutputStream(bs)){
-                        final List requestedFormat = (List) input.getBody().get("format");
+                        final List requestedFormat = (List) ((MappedRecord)input.getBody()).get("format");
         			    final MapperFactory_1 mapperFactory = new MapperFactory_1(requestedFormat.isEmpty() ? DEFAULT_FORMAT : requestedFormat);
         			    for(Mapper_1_0 mapper : mapperFactory) {
         			        if(
@@ -917,8 +917,8 @@ public class Model_2 extends AbstractRestPort {
 			    input.getResourceIdentifier().getPrefix(input.getResourceIdentifier().size()-2)
 			);
 			// search elements with matching types
-			String ofType = (String) input.getBody().get("ofType");
-			boolean includeSubtypes = ((Boolean)input.getBody().get("includeSubtypes"));
+			String ofType = (String) ((MappedRecord)input.getBody()).get("ofType");
+			boolean includeSubtypes = ((Boolean) ((MappedRecord)input.getBody()).get("includeSubtypes"));
 			List<Path> result = new ArrayList<>();
 			
 			for(ObjectRecord content : contents) {
@@ -933,8 +933,8 @@ public class Model_2 extends AbstractRestPort {
 			    	result.add(content.getResourceIdentifier());
 				}
 			}
-			output.getBody().put("ofType", ofType);
-			output.getBody().put("result", toIndexedRecordSet(result));
+			((MappedRecord)output.getBody()).put("ofType", ofType);
+			((MappedRecord)output.getBody()).put("result", toIndexedRecordSet(result));
 			return true;
 		}
 
@@ -954,7 +954,7 @@ public class Model_2 extends AbstractRestPort {
 			List<ObjectRecord> contents = getNamespaceContent(
 			    input.getResourceIdentifier().getPrefix(input.getResourceIdentifier().size()-2)
 			);  
-			final Object qualifiedName = input.getBody().get("qualifiedName");
+			final Object qualifiedName = ((MappedRecord)input.getBody()).get("qualifiedName");
 			List<Path> result = new ArrayList<>();
 			for(ObjectRecord content : contents){
 			    if(content.getValue().get("qualifiedName").equals(qualifiedName)) {
@@ -974,8 +974,8 @@ public class Model_2 extends AbstractRestPort {
 			        )
 			    );
 			}
-			output.getBody().put("qualifiedName", qualifiedName);
-			output.getBody().put("result", toIndexedRecordSet(result));
+			((MappedRecord)output.getBody()).put("qualifiedName", qualifiedName);
+			((MappedRecord)output.getBody()).put("result", toIndexedRecordSet(result));
 			return true;
 		}
 
@@ -991,7 +991,7 @@ public class Model_2 extends AbstractRestPort {
 			List<ObjectRecord> contents = getNamespaceContent(
 			    input.getResourceIdentifier().getPrefix(input.getResourceIdentifier().size()-2)
 			);  
-			final Object name = input.getBody().get("name");
+			final Object name = ((MappedRecord)input.getBody()).get("name");
 			List<Path> result = new ArrayList<>();
 			for(ObjectRecord content : contents){
 				if(content.getValue().get("name").equals(name)) {
@@ -1011,8 +1011,8 @@ public class Model_2 extends AbstractRestPort {
 			        )
 			    );
 			}
-			output.getBody().put("name", name);
-			output.getBody().put("result", toIndexedRecordSet(result));
+			((MappedRecord)output.getBody()).put("name", name);
+			((MappedRecord)output.getBody()).put("result", toIndexedRecordSet(result));
 			return true;
 		}
 

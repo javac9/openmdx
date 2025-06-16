@@ -45,10 +45,14 @@
 
 package org.openmdx.base.rest.cci;
 
-import #if JAVA_8 javax.resource.cci.MappedRecord #else jakarta.resource.cci.MappedRecord #endif;
-
+#if JAVA_8
+import javax.resource.cci.MappedRecord;
+import javax.resource.cci.Record;
+#else
+import jakarta.resource.cci.MappedRecord;
+import jakarta.resource.cci.Record;
+#endif
 import org.openmdx.base.naming.Path;
-
 
 /**
  * Message Record
@@ -56,7 +60,7 @@ import org.openmdx.base.naming.Path;
 public interface MessageRecord extends RequestRecord {
 
     /**
-     * An message record's name
+     * A message record's name
      */
     String NAME = "org:openmdx:kernel:Message";
     
@@ -65,15 +69,15 @@ public interface MessageRecord extends RequestRecord {
      * 
      * @return the message body
      */
-    MappedRecord getBody();
-    
+    #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif getBody();
+
     /**
      * Set the message body
      * 
      * @param body the message body, or {@code null} to assign 
      * an {@code org::openmdx::base::Void} instance
      */
-    void setBody(MappedRecord body);
+    void setBody(#if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif body);
 
     /**
      * Retrieve the target

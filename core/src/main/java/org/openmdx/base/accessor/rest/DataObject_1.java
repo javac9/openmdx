@@ -47,10 +47,13 @@ package org.openmdx.base.accessor.rest;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -2173,10 +2176,10 @@ public class DataObject_1
      */
     private void assertReadLock(
         DataObject_1_0 beforeImage,
-        #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif lockValue
+        #if CLASSIC_CHRONO_TYPES java.util.Date #else Instant #endif lockValue
     )
         throws ServiceException {
-        #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif currentValue = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(SystemAttributes.MODIFIED_AT));
+        #if CLASSIC_CHRONO_TYPES java.util.Date #else Instant #endif currentValue = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(SystemAttributes.MODIFIED_AT));
         if (currentValue != null) {
             if (currentValue.#if CLASSIC_CHRONO_TYPES after #else isAfter #endif(lockValue)) {
                 throw new ServiceException(
@@ -2209,11 +2212,11 @@ public class DataObject_1
             try {
                 String lockFeature = lockMatcher.group(1);
                     #if CLASSIC_CHRONO_TYPES java.util.Date #else
-                java.time.Instant #endif currentValue
+                Instant #endif currentValue
                         = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(lockFeature));
                 if (currentValue != null) {
                         #if CLASSIC_CHRONO_TYPES java.util.Date #else
-                    java.time.Instant #endif lockValue
+                    Instant #endif lockValue
                             = DateTimeFormat.EXTENDED_UTC_FORMAT.parse(lockMatcher.group(2) + "Z");
                     if (!lockValue.equals(currentValue)) {
                         throw new ServiceException(
@@ -3458,7 +3461,7 @@ public class DataObject_1
                 MethodInvocationSpec methodInvocationSpec = (MethodInvocationSpec) ispec;
                 Operation entry = new Operation(
                     methodInvocationSpec.getFunctionName(),
-                    (MappedRecord) input,
+                    #if CLASSIC_CHRONO_TYPES (MappedRecord) #endif input,
                     (MappedRecord) output
                 );
                 boolean query = methodInvocationSpec.getInteractionVerb() == InteractionSpec.SYNC_SEND_RECEIVE;
@@ -3574,9 +3577,9 @@ public class DataObject_1
      * @serialData The objects data
      */
     private synchronized void writeObject(
-        java.io.ObjectOutputStream stream
+        ObjectOutputStream stream
     )
-        throws java.io.IOException {
+        throws IOException {
         try {
             TransactionalState_1 state = this.getState(true);
             stream.defaultWriteObject();
@@ -3601,9 +3604,9 @@ public class DataObject_1
      * deserialize it).
      */
     private void readObject(
-        java.io.ObjectInputStream stream
+        ObjectInputStream stream
     )
-        throws java.io.IOException,
+        throws IOException,
         ClassNotFoundException {
         stream.defaultReadObject();
         this.flushableValues = Maps.newMap(objThreadSafetyRequired());
@@ -4380,10 +4383,10 @@ public class DataObject_1
          */
         private final Map<String, Object> nonTransactional;
 
-        private final Set<Map.Entry<String, Object>> entries = new AbstractSet<Map.Entry<String, Object>>() {
+        private final Set<Entry<String, Object>> entries = new AbstractSet<Entry<String, Object>>() {
 
             @Override
-            public Iterator<Map.Entry<String, Object>> iterator() {
+            public Iterator<Entry<String, Object>> iterator() {
                 return new EntryIterator();
             }
 
@@ -4451,7 +4454,7 @@ public class DataObject_1
         }
 
         @Override
-        public Set<java.util.Map.Entry<String, Object>> entrySet() {
+        public Set<Entry<String, Object>> entrySet() {
             return this.entries;
         }
 
@@ -4530,13 +4533,13 @@ public class DataObject_1
         /**
          * Entry Iterator
          */
-        class EntryIterator implements Iterator<Map.Entry<String, Object>> {
+        class EntryIterator implements Iterator<Entry<String, Object>> {
 
             private Map<String, Object> readOnly = ManagedMap.this.getDelegate(false, false);
 
-            private Iterator<Map.Entry<String, Object>> delegate = readOnly.entrySet().iterator();
+            private Iterator<Entry<String, Object>> delegate = readOnly.entrySet().iterator();
 
-            protected Map.Entry<String, Object> current = null;
+            protected Entry<String, Object> current = null;
 
             protected void makeDirty() {
                 if (this.readOnly != null) {
@@ -4546,7 +4549,7 @@ public class DataObject_1
                     if (forUpdate != readOnly) {
                         this.delegate = forUpdate.entrySet().iterator();
                         while (this.delegate.hasNext()) {
-                            Map.Entry<String, Object> candidate = this.delegate.next();
+                            Entry<String, Object> candidate = this.delegate.next();
                             if (this.current.getKey().equals(candidate.getKey())) {
                                 this.current = candidate;
                                 return;
@@ -4575,9 +4578,9 @@ public class DataObject_1
              * @see java.util.Iterator#next()
              */
             @Override
-            public Map.Entry<String, Object> next() {
+            public Entry<String, Object> next() {
                 this.current = this.delegate.next();
-                return new Map.Entry<String, Object>() {
+                return new Entry<String, Object>() {
 
                     public String getKey() {
                         return EntryIterator.this.current.getKey();
@@ -4752,10 +4755,10 @@ public class DataObject_1
          */
         private final SortedMap<Integer, Object> nonTransactional;
 
-        private final Set<Map.Entry<Integer, Object>> entries = new AbstractSet<Map.Entry<Integer, Object>>() {
+        private final Set<Entry<Integer, Object>> entries = new AbstractSet<Entry<Integer, Object>>() {
 
             @Override
-            public Iterator<Map.Entry<Integer, Object>> iterator() {
+            public Iterator<Entry<Integer, Object>> iterator() {
                 return new EntryIterator();
             }
 
@@ -4833,7 +4836,7 @@ public class DataObject_1
          * @see java.util.AbstractMap#entrySet()
          */
         @Override
-        public Set<java.util.Map.Entry<Integer, Object>> entrySet() {
+        public Set<Entry<Integer, Object>> entrySet() {
             return this.entries;
         }
 
@@ -5131,7 +5134,7 @@ public class DataObject_1
             }
 
             @Override
-            public Set<java.util.Map.Entry<Integer, Object>> entrySet() {
+            public Set<Entry<Integer, Object>> entrySet() {
                 return this.getSubMap().entrySet();
             }
 
@@ -5177,13 +5180,13 @@ public class DataObject_1
         /**
          * Entry Iterator
          */
-        class EntryIterator implements Iterator<Map.Entry<Integer, Object>> {
+        class EntryIterator implements Iterator<Entry<Integer, Object>> {
 
             private SortedMap<Integer, Object> readOnly = ManagedSortedMap.this.getDelegate(false, false);
 
-            private Iterator<Map.Entry<Integer, Object>> delegate = readOnly.entrySet().iterator();
+            private Iterator<Entry<Integer, Object>> delegate = readOnly.entrySet().iterator();
 
-            protected Map.Entry<Integer, Object> current = null;
+            protected Entry<Integer, Object> current = null;
 
             protected void makeDirty() {
                 if (this.readOnly != null) {
@@ -5193,7 +5196,7 @@ public class DataObject_1
                     if (forUpdate != readOnly) {
                         this.delegate = forUpdate.entrySet().iterator();
                         while (this.delegate.hasNext()) {
-                            Map.Entry<Integer, Object> candidate = this.delegate.next();
+                            Entry<Integer, Object> candidate = this.delegate.next();
                             if (this.current.getKey().equals(candidate.getKey())) {
                                 this.current = candidate;
                                 return;
@@ -5222,9 +5225,9 @@ public class DataObject_1
              * @see java.util.Iterator#next()
              */
             @Override
-            public Map.Entry<Integer, Object> next() {
+            public Entry<Integer, Object> next() {
                 this.current = this.delegate.next();
-                return new Map.Entry<Integer, Object>() {
+                return new Entry<Integer, Object>() {
 
                     public Integer getKey() {
                         return EntryIterator.this.current.getKey();
@@ -5269,6 +5272,7 @@ public class DataObject_1
         /**
          * Constructor
          */
+        #if CLASSIC_CHRONO_TYPES
         Operation(
             String functionName,
             MappedRecord input,
@@ -5278,6 +5282,17 @@ public class DataObject_1
             this.input = input;
             this.output = output;
         }
+        #else
+        Operation(
+                String functionName,
+                Record input,
+                MappedRecord output
+        ) {
+            this.operation = functionName;
+            this.input = input;
+            this.output = output;
+        }
+        #endif
 
         /**
          * The operation name
@@ -5287,7 +5302,7 @@ public class DataObject_1
         /**
          * The operation request
          */
-        private final MappedRecord input;
+        private final #if CLASSIC_CHRONO_TYPES MappedRecord #else Record #endif input;
 
         /**
          * The operation response
@@ -5310,7 +5325,7 @@ public class DataObject_1
                     jdoGetPersistenceManager().getInteractionSpecs().INVOKE,
                     input
                 );
-                this.output.putAll(replies.getBody());
+                this.output.putAll(#if CLASSIC_CHRONO_TYPES #else (Map) #endif replies.getBody());
             } catch (ResourceException exception) {
                 throw new ServiceException(exception);
             }

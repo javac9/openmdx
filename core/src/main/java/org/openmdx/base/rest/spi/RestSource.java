@@ -69,7 +69,8 @@ public class RestSource implements Closeable {
     ){
         this.urlDecoder = new URLDecoder(".");
         this.body = body;
-        this.format = Format.WBXML;
+//        this.format = Format.WBXML;
+        this.format = Format.XML;
         this.exhaust = false;
         this.closeable = null;
     }

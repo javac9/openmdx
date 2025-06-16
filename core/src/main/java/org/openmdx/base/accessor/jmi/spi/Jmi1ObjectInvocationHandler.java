@@ -1,28 +1,28 @@
 /*
  * ====================================================================
  * Project:     openMDX/Core, http://www.openmdx.org/
- * Description: JMI 1 Object Invocation Handler 
+ * Description: JMI 1 Object Invocation Handler
  * Owner:       the original authors.
  * ====================================================================
  *
  * This software is published under the BSD license as listed below.
- * 
+ *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright
  *   notice, this list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright
  *   notice, this list of conditions and the following disclaimer in
  *   the documentation and/or other materials provided with the
  *   distribution.
- * 
+ *
  * * Neither the name of the openMDX team nor the names of its
  *   contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -36,9 +36,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * ------------------
- * 
+ *
  * This product includes software developed by other organizations as
  * listed in the NOTICE file.
  */
@@ -76,7 +76,6 @@ import javax.jmi.reflect.RefObject;
 import javax.jmi.reflect.RefPackage;
 
 import javax.jmi.reflect.RefStruct;
-import #if JAVA_8 javax.resource.cci.IndexedRecord #else jakarta.resource.cci.IndexedRecord#endif;
 import org.oasisopen.jmi1.RefContainer;
 import org.omg.mof.spi.Identifier;
 import org.openmdx.base.accessor.jmi.cci.JmiServiceException;
@@ -117,85 +116,85 @@ import org.w3c.cci2.SparseArray;
 public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializable {
 
     /**
-     * Constructor 
+     * Constructor
      */
     Jmi1ObjectInvocationHandler(
-        Jmi1Class_1_0 refClass,
-        PersistenceCapable delegate,
-        ClassMapping_1_0 mapping
+            Jmi1Class_1_0 refClass,
+            PersistenceCapable delegate,
+            ClassMapping_1_0 mapping
     ){
         this.refClass = refClass;
         this.refDelegate = refClass.isTerminal() ? new RefObject_1(
-            (ObjectView_1_0)delegate, 
-            refClass
+                (ObjectView_1_0)delegate,
+                refClass
         ) : new DelegatingRefObject_1(
-            delegate, 
-            refClass
+                delegate,
+                refClass
         );
         this.mapping = mapping;
-        this.aspectImplementationDescriptors = mapping.getAspectImplementationDescriptors();     
+        this.aspectImplementationDescriptors = mapping.getAspectImplementationDescriptors();
         this.aspectImplementationInstances = new Object[
-            this.aspectImplementationDescriptors.length                                    
-        ];
+                this.aspectImplementationDescriptors.length
+                ];
     }
 
     /**
      * Implements {@code Serializable}
      */
     private static final long serialVersionUID = 7709571315051480193L;
-    
+
     protected final RefObject refDelegate;
     protected final Jmi1Class_1_0 refClass;
     private final AspectImplementationDescriptor[] aspectImplementationDescriptors;
     private final Object[] aspectImplementationInstances;
     private transient FeatureMapper featureMapper;
     private final ClassMapping_1_0 mapping;
-    
+
     /**
      * Retrieve the validating marshaller
-     * 
+     *
      * @return the validating marshaller
      */
     private ValidatingMarshaller getValidator(){
         return ((RefRootPackage_1)this.refClass.refOutermostPackage()).validatingMarshaller;
     }
-    
+
     /**
      * Retrieve the mapping
-     * 
+     *
      * @return the mapping
      */
     private Mapping_1_0 getMapping(){
-        return ((Jmi1Package_1_0)this.refClass.refOutermostPackage()).refMapping(); 
+        return ((Jmi1Package_1_0)this.refClass.refOutermostPackage()).refMapping();
     }
-  
+
     /**
      * Retrieve the feature mapper
-     * 
+     *
      * @return the feature mapper
-     * 
+     *
      * @throws ServiceException in case of failure
      */
     protected FeatureMapper getFeatureMapper(
     ) throws ServiceException {
         if(this.featureMapper == null) {
             this.featureMapper = getMapping().getFeatureMapper(
-                refClass.refMofId(), 
-                refClass.isTerminal() ? FeatureMapper.Type.TEMRINAL : FeatureMapper.Type.NON_TERMINAL
-            ); 
+                    refClass.refMofId(),
+                    refClass.isTerminal() ? FeatureMapper.Type.TEMRINAL : FeatureMapper.Type.NON_TERMINAL
+            );
         }
         return this.featureMapper;
     }
 
     /**
      * Retrive a (maybe newly created) aspect implementation instance
-     *  
+     *
      * @return the requested aspect implementation instance
      */
     protected Object getAspectImplementationInstance(
-        int index,
-        Object self,
-        Object next
+            int index,
+            Object self,
+            Object next
     ) throws ServiceException{
         if(this.aspectImplementationInstances[index] == null) try {
             this.aspectImplementationInstances[index] = this.aspectImplementationDescriptors[index].implementationConstructor.newInstance(self, next);
@@ -211,7 +210,7 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * @return the proxy's invocation handler
      */
     private static Jmi1ObjectInvocationHandler getInstance(
-        Object proxy
+            Object proxy
     ) throws ServiceException {
         if(proxy != null) {
             if(Proxy.isProxyClass(proxy.getClass())) {
@@ -222,49 +221,49 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
             }
         }
         throw new ServiceException(
-            BasicException.Code.DEFAULT_DOMAIN,
-            BasicException.Code.BAD_PARAMETER,
-            "The object is not a proxy handled by " + Jmi1ObjectInvocationHandler.class.getName(),
-            new BasicException.Parameter("class", proxy == null ? null : proxy.getClass().getName())
+                BasicException.Code.DEFAULT_DOMAIN,
+                BasicException.Code.BAD_PARAMETER,
+                "The object is not a proxy handled by " + Jmi1ObjectInvocationHandler.class.getName(),
+                new BasicException.Parameter("class", proxy == null ? null : proxy.getClass().getName())
         );
     }
-    
+
     /**
      * Retrieve the aspect implementation instance
-     * 
+     *
      * @param proxy the proxy object
      * @param aspectImplementationClass the requested class
-     * 
+     *
      * @return the aspect implementation instance, or {@code null} if the aspectImplementationClass is not applicable to {@code proxy}
      */
     public static <T> T getAspectImplementationInstance(
-        Object proxy,
-        Class<T> aspectImplementationClass
+            Object proxy,
+            Class<T> aspectImplementationClass
     ) throws ServiceException {
         Jmi1ObjectInvocationHandler handler = getInstance(proxy);
         for(int i = 0; i < handler.aspectImplementationDescriptors.length; i++) {
             if(aspectImplementationClass.isAssignableFrom(handler.aspectImplementationDescriptors[i].implementationClass)) {
-                Object next = ((DelegatingRefObject_1_0)handler.refDelegate).openmdxjdoGetDelegate(); 
+                Object next = ((DelegatingRefObject_1_0)handler.refDelegate).openmdxjdoGetDelegate();
                 return aspectImplementationClass.cast(handler.getAspectImplementationInstance(i, proxy, next));
             }
         }
         return null;
     }
-    
+
     /**
      * Retrieve the invocation target
      *
      * @return the implementation for the given feature
      */
     protected InvocationTarget getImpl(
-        Object self,
-        Object next,
-        Method method
+            Object self,
+            Object next,
+            Method method
     ) throws ServiceException {
         InvocationDescriptor descriptor = this.mapping.getInvocationDescriptor(method);
         return descriptor == null ? null : new InvocationTarget(
-            this.getAspectImplementationInstance(descriptor.index, self, next),
-            descriptor.method
+                this.getAspectImplementationInstance(descriptor.index, self, next),
+                descriptor.method
         );
     }
 
@@ -272,11 +271,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * Replace the content of the target map
      */
     @SuppressWarnings({
-        "rawtypes", "unchecked"
+            "rawtypes", "unchecked"
     })
     private Void setMultivalue(
-        Map target,
-        Object source
+            Map target,
+            Object source
     ){
         target.clear();
         if(source == null) {
@@ -296,20 +295,20 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                     }
                 } else {
                     throw new JmiServiceException(
-                        BasicException.Code.DEFAULT_DOMAIN,
-                        BasicException.Code.BAD_PARAMETER,
-                        "The given value is incompatible to the target",
-                        new BasicException.Parameter("target", SparseArray.class.getName()),
-                        new BasicException.Parameter("source", source.getClass().getName())
+                            BasicException.Code.DEFAULT_DOMAIN,
+                            BasicException.Code.BAD_PARAMETER,
+                            "The given value is incompatible to the target",
+                            new BasicException.Parameter("target", SparseArray.class.getName()),
+                            new BasicException.Parameter("source", source.getClass().getName())
                     );
                 }
             } else {
                 throw new JmiServiceException(
-                    BasicException.Code.DEFAULT_DOMAIN,
-                    BasicException.Code.BAD_PARAMETER,
-                    "The given value is incompatible to the target",
-                    new BasicException.Parameter("target", target.getClass().getName()),
-                    new BasicException.Parameter("source", source.getClass().getName())
+                        BasicException.Code.DEFAULT_DOMAIN,
+                        BasicException.Code.BAD_PARAMETER,
+                        "The given value is incompatible to the target",
+                        new BasicException.Parameter("target", target.getClass().getName()),
+                        new BasicException.Parameter("source", source.getClass().getName())
                 );
             }
         }
@@ -322,11 +321,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * @exception JmiServiceException in case of an incompatible value
      */
     @SuppressWarnings({
-        "unchecked", "rawtypes"
+            "unchecked", "rawtypes"
     })
     private Void setMultivalue (
-        Collection target,
-        Object source
+            Collection target,
+            Object source
     ){
         target.clear();
         if(source == null) {
@@ -338,11 +337,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                 target.addAll(ArraysExtension.asList(source));
             } else {
                 throw new JmiServiceException(
-                    BasicException.Code.DEFAULT_DOMAIN,
-                    BasicException.Code.BAD_PARAMETER,
-                    "The given value is incompatible to the target",
-                    new BasicException.Parameter("target", target.getClass().getName()),
-                    new BasicException.Parameter("source", source.getClass().getName())
+                        BasicException.Code.DEFAULT_DOMAIN,
+                        BasicException.Code.BAD_PARAMETER,
+                        "The given value is incompatible to the target",
+                        new BasicException.Parameter("target", target.getClass().getName()),
+                        new BasicException.Parameter("source", source.getClass().getName())
                 );
             }
         }
@@ -350,7 +349,7 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
     }
 
     @SuppressWarnings({
-        "unchecked", "rawtypes"
+            "unchecked", "rawtypes"
     })
     #if CLASSIC_CHRONO_TYPES
     @Override
@@ -927,8 +926,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                                 // Qualifier
                                 //
                                 Container<?> collection = (Container<?>) ((Jmi1Object_1_0)this.refDelegate).refGetValue(
-                                    featureName,
-                                    args[0]
+                                        featureName,
+                                        args[0]
                                 );
                                 return collection.getAll(null);
                             } else {
@@ -1283,15 +1282,15 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * @return the feature's name
      */
     private static String getFeatureName(
-        Object feature
+            Object feature
     ){
-    	String featureName;
+        String featureName;
         if(feature instanceof String) {
-        	featureName = (String) feature;
+            featureName = (String) feature;
         } else if (feature instanceof RefObject) {
-        	featureName = ((RefObject)feature).refMofId();
+            featureName = ((RefObject)feature).refMofId();
         } else throw new IllegalArgumentException(
-            "refGetValue expects a String or a RefObject as first argument: " + (feature == null ? "null" : feature.getClass().getName())
+                "refGetValue expects a String or a RefObject as first argument: " + (feature == null ? "null" : feature.getClass().getName())
         );
         return featureName.substring(featureName.lastIndexOf(':') + 1);
     }
@@ -1303,65 +1302,65 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      */
     @SuppressWarnings("unchecked")
     private Object marshal(
-        Object value,
-        String featureName,
-        Class<?> returnType
+            Object value,
+            String featureName,
+            Class<?> returnType
     ) throws ServiceException {
         if(value instanceof InputStream){
             return new Jmi1BinaryLargeObject(
-                featureName,
-                (InputStream)value
+                    featureName,
+                    (InputStream)value
             );
         }
         if(value instanceof SortedMap) {
             return SortedMaps.asSparseArray(
-                (SortedMap<Integer,?>)value
+                    (SortedMap<Integer,?>)value
             );
         }
         if(value instanceof RefContainer){
             return Classes.newProxyInstance(
-                new Jmi1ContainerInvocationHandlerWithRefDelegate(this.getValidator(), (RefContainer<?>)value),
-                returnType == null ? getReturnType(featureName) : returnType,
-                RefContainer.class,
-                PersistenceCapableCollection.class,
-                Serializable.class
+                    new Jmi1ContainerInvocationHandlerWithRefDelegate(this.getValidator(), (RefContainer<?>)value),
+                    returnType == null ? getReturnType(featureName) : returnType,
+                    RefContainer.class,
+                    PersistenceCapableCollection.class,
+                    Serializable.class
             );
         }
         if(value instanceof Reader){
             return new Jmi1CharacterLargeObject(
-                featureName,
-                (Reader)value
+                    featureName,
+                    (Reader)value
             );
         }
         getValidator().validate(value);
         return value;
     }
 
-	/**
-	 * Determine the feature's return type
-	 */
-	private Class<?> getReturnType(String featureName) throws ServiceException {
-		try {
-		    return this.refClass.getDelegateClass().getMethod(
-		        Identifier.OPERATION_NAME.toIdentifier(
-		            featureName,
-		            null, // removablePrefix
-		            "get", // prependablePrefix
-		            null, // removableSuffix
-		            null // appendableSuffix
-		        )
-		    ).getReturnType();
-		} catch (NoSuchMethodException exception) {
-		    throw new ServiceException(
-		        exception,
-		        BasicException.Code.DEFAULT_DOMAIN,
-		        BasicException.Code.TRANSFORMATION_FAILURE,
-		        "Unable to determine the container interface",
-		        new BasicException.Parameter("parent-class", this.refClass.getDelegateClass().getName()),
-		        new BasicException.Parameter("feature", featureName)
-		    );
-		}
-	}
+    /**
+     * Determine the feature's return type
+     */
+    private Class<?> getReturnType(String featureName) throws ServiceException {
+        try {
+            return this.refClass.getDelegateClass().getMethod(
+                    Identifier.OPERATION_NAME.toIdentifier(
+                            featureName,
+                            null, // removablePrefix
+                            "get", // prependablePrefix
+                            null, // removableSuffix
+                            null // appendableSuffix
+                    )
+            ).getReturnType();
+        } catch (NoSuchMethodException exception) {
+            throw new ServiceException(
+                    exception,
+                    BasicException.Code.DEFAULT_DOMAIN,
+                    BasicException.Code.TRANSFORMATION_FAILURE,
+                    "Unable to determine the container interface",
+                    new BasicException.Parameter("parent-class", this.refClass.getDelegateClass().getName()),
+                    new BasicException.Parameter("feature", featureName)
+            );
+        }
+    }
 
     /**
      * Validate an XRI sub-segment
@@ -1371,17 +1370,17 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * @exception JmiException BAD_PARAMETER if the sub-segment is {@code null}Y
      */
     private static Object validateSubSegment(
-    	Object subSegment
+            Object subSegment
     ){
-    	if(subSegment == null) {
-	    	throw new JmiServiceException(
-	    		BasicException.Code.DEFAULT_DOMAIN,
-	    		BasicException.Code.BAD_PARAMETER,
-	    		"Null is an invalid value for an XRI sub-segment"
-	    	);
-    	} else {
-	    	return subSegment;
-    	}
+        if(subSegment == null) {
+            throw new JmiServiceException(
+                    BasicException.Code.DEFAULT_DOMAIN,
+                    BasicException.Code.BAD_PARAMETER,
+                    "Null is an invalid value for an XRI sub-segment"
+            );
+        } else {
+            return subSegment;
+        }
     }
 
     #if CLASSIC_CHRONO_TYPES
@@ -1624,11 +1623,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                         (args[0] instanceof org.openmdx.base.cci2.Void);
         if (invocationTarget == null) {
             if (
-                kind != Kind.METHOD &&
-                next instanceof RefObject &&
-                args != null &&
-                args.length == 1 &&
-                args[0] instanceof RefStruct_1_0
+                    kind != Kind.METHOD &&
+                            next instanceof RefObject &&
+                            args != null &&
+                            args.length == 1 &&
+                            args[0] instanceof RefStruct_1_0
             ) {
                 final RefStruct_1_0 in = (RefStruct_1_0) args[0];
                 final RefStruct_1_0 out;
@@ -1642,11 +1641,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                 return out == null ? null :  ((RefPackage_1_0) ((RefObject)proxy).refOutermostPackage()).refCreateStruct(out.refDelegate());
 
             } else if(
-                kind != Kind.METHOD &&
-                next instanceof RefObject &&
-                args != null &&
-                args.length == 1 &&
-                args[0] instanceof RefList_1_0
+                    kind != Kind.METHOD &&
+                            next instanceof RefObject &&
+                            args != null &&
+                            args.length == 1 &&
+                            args[0] instanceof RefList_1_0
             ) {
                 // For Flavour 3/5 operations with IndexedRecord
                 final RefList_1_0 in = (RefList_1_0) args[0];
@@ -1660,46 +1659,26 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                 if (hasVoidArg) {
                     arguments = null;
                 } else if (
-                    args != null &&
-                    args.length == 1 &&
-                    "setCore".equals(method.getName()) && (
-                    method.getDeclaringClass() == Aspect.class ||
-                            method.getDeclaringClass() == org.openmdx.base.jmi1.Aspect.class
-                    )
+                        args != null &&
+                                args.length == 1 &&
+                                "setCore".equals(method.getName()) && (
+                                method.getDeclaringClass() == Aspect.class ||
+                                        method.getDeclaringClass() == org.openmdx.base.jmi1.Aspect.class
+                        )
                 ) {
                     arguments = new Object[]{
                             marshaller.getOutermostPackage().unmarshalUnchecked(args[0])
                     };
-
-                } else if (
-                    args != null &&
-//                    args.length == 1 &&
-//                    args[0] instanceof IndexedRecord &&
-                                kind != Kind.METHOD
-                ) {
-                    // For Flavour 3/5 operations with IndexedRecord
-                    IndexedRecord boxedParams = (IndexedRecord) args[0];
-
-                    // Check if the target method expects a single parameter that matches the IndexedRecord type
-                    Class<?>[] parameterTypes = method.getParameterTypes();
-                    if (parameterTypes.length == 1) {
-                        // Try to pass the IndexedRecord directly first
-                        arguments = new Object[]{boxedParams};
-                    } else {
-                        // Unbox IndexedRecord for methods expecting multiple parameters
-                        arguments = marshaller.unmarshal(boxedParams.toArray());
-                    }
-
                 } else {
                     arguments = marshaller.unmarshal(args);
                 }
 
                 try {
                     return marshaller.marshal(
-                        method.invoke(
-                            next,
-                            arguments
-                        )
+                            method.invoke(
+                                    next,
+                                    arguments
+                            )
                     );
 
                 } catch (InvocationTargetException exception) {
@@ -1800,30 +1779,30 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                 //
                 return null;
             } else{
-               int l = message.length();
-               if(l > 0 && Character.isJavaIdentifierStart(message.charAt(0))) {
-                   //
-                   // Message might start with a Java class name
-                   //
-                   int i = 1;
-                   while(i < l && Character.isJavaIdentifierPart(message.charAt(i))) {
-                       i++;
-                   }
-                   try{
-                       return Classes.getApplicationClass(message.substring(0, i));
-                   } catch(ClassNotFoundException e) {
-                       //
-                       // It was not a Java class name
-                       //
-                       return null;
-                   }
-              } else {
-                  //
-                  // Message does not start with a Java class name
-                  //
-                  return null;
-              }
-           }
+                int l = message.length();
+                if(l > 0 && Character.isJavaIdentifierStart(message.charAt(0))) {
+                    //
+                    // Message might start with a Java class name
+                    //
+                    int i = 1;
+                    while(i < l && Character.isJavaIdentifierPart(message.charAt(i))) {
+                        i++;
+                    }
+                    try{
+                        return Classes.getApplicationClass(message.substring(0, i));
+                    } catch(ClassNotFoundException e) {
+                        //
+                        // It was not a Java class name
+                        //
+                        return null;
+                    }
+                } else {
+                    //
+                    // Message does not start with a Java class name
+                    //
+                    return null;
+                }
+            }
         } else{
             //
             // Just pass on other causes
@@ -1846,8 +1825,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
          * Constructor
          */
         Jmi1BinaryLargeObject(
-            String featureName,
-            InputStream value
+                String featureName,
+                InputStream value
         ) {
             this.featureName = featureName;
             this.initialValue = value;
@@ -1859,8 +1838,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         public InputStream getContent(
         ) {
             InputStream value = this.initialValue == null ?
-                (InputStream)Jmi1ObjectInvocationHandler.this.refDelegate.refGetValue(this.featureName) :
-                this.initialValue;
+                    (InputStream)Jmi1ObjectInvocationHandler.this.refDelegate.refGetValue(this.featureName) :
+                    this.initialValue;
             this.initialValue = null;
             return value;
         }
@@ -1881,8 +1860,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
          * @see org.w3c.cci2.BinaryLargeObject#getContent(java.io.OutputStream, long)
          */
         public void getContent(
-            OutputStream stream,
-            long position
+                OutputStream stream,
+                long position
         ) throws IOException {
             this.length = position + BinaryLargeObjects.streamCopy(
                     getContent(),
@@ -1907,8 +1886,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
          * Constructor
          */
         Jmi1CharacterLargeObject(
-            String featureName,
-            Reader value
+                String featureName,
+                Reader value
         ) {
             this.featureName = featureName;
             this.initialValue = value;
@@ -1922,8 +1901,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         public Reader getContent(
         ) {
             Reader value = this.initialValue == null ?
-                (Reader)Jmi1ObjectInvocationHandler.this.refDelegate.refGetValue(this.featureName) :
-                this.initialValue;
+                    (Reader)Jmi1ObjectInvocationHandler.this.refDelegate.refGetValue(this.featureName) :
+                    this.initialValue;
             this.initialValue = null;
             return value;
         }
@@ -1936,8 +1915,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
 
         @Override
         public void getContent(
-            Writer stream,
-            long position
+                Writer stream,
+                long position
         ) throws IOException {
             this.length = position + CharacterLargeObjects.streamCopy(
                     getContent(),
@@ -1959,8 +1938,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
     static class InvocationTarget {
 
         InvocationTarget(
-            Object object,
-            Method method
+                Object object,
+                Method method
         ) {
             this.object = object;
             this.method = method;
@@ -1970,21 +1949,21 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         private final Method method;
 
         Object invoke(
-            Object... arguments
+                Object... arguments
         ) throws ServiceException, IllegalAccessException, InvocationTargetException {
             try {
                 return this.method.invoke(
-                    this.object,
-                    arguments
+                        this.object,
+                        arguments
                 );
             } catch (IllegalArgumentException exception) {
                 throw new ServiceException(
-                    exception,
-                    BasicException.Code.DEFAULT_DOMAIN,
-                    BasicException.Code.BAD_PARAMETER,
-                    "The method's arguments are not compatible with the method's signature",
-                    new BasicException.Parameter("method", this.method),
-                    new BasicException.Parameter("arguments", arguments)
+                        exception,
+                        BasicException.Code.DEFAULT_DOMAIN,
+                        BasicException.Code.BAD_PARAMETER,
+                        "The method's arguments are not compatible with the method's signature",
+                        new BasicException.Parameter("method", this.method),
+                        new BasicException.Parameter("arguments", arguments)
                 );
             }
         }
@@ -2000,14 +1979,14 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
      * The non-terminal RefObject implementation
      */
     private static class DelegatingRefObject_1
-        implements DelegatingRefObject_1_0, Cloneable<RefObject>, Serializable {
+            implements DelegatingRefObject_1_0, Cloneable<RefObject>, Serializable {
 
         /**
          * Constructor
          */
         DelegatingRefObject_1(
-            Object delegate,
-            RefClass refClass
+                Object delegate,
+                RefClass refClass
         ){
             this.cciDelegate = delegate;
             this.refClass = refClass;
@@ -2023,11 +2002,11 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         private RefObject metaObject = null;
 
         private final static String REFLECTIVE =
-            "This reflective method should be dispatched by the invocation " +
-            "handler to its non-reflective counterpart";
+                "This reflective method should be dispatched by the invocation " +
+                        "handler to its non-reflective counterpart";
 
         private final static String STANDARD =
-            "This JMI method is not supported by CCI delegates";
+                "This JMI method is not supported by CCI delegates";
 
         @Override
         public Path refGetPath(
@@ -2043,9 +2022,9 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         @Override
         public void refDelete() {
             ReducedJDOHelper.getPersistenceManager(
-                this.cciDelegate
+                    this.cciDelegate
             ).deletePersistent(
-                this.cciDelegate
+                    this.cciDelegate
             );
         }
 
@@ -2063,8 +2042,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
 
         @Override
         public boolean refIsInstanceOf(
-            RefObject objType,
-            boolean considerSubtypes
+                RefObject objType,
+                boolean considerSubtypes
         ) {
             try {
                 Model_1_0 model = refOutermostPackage().refModel();
@@ -2073,10 +2052,10 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
                 }
                 else {
                     throw new ServiceException(
-                        BasicException.Code.DEFAULT_DOMAIN,
-                        BasicException.Code.ASSERTION_FAILURE,
-                        "objType must be a class type",
-                        new BasicException.Parameter("objType.refClass", objType.refClass().refMofId())
+                            BasicException.Code.DEFAULT_DOMAIN,
+                            BasicException.Code.ASSERTION_FAILURE,
+                            "objType must be a class type",
+                            new BasicException.Parameter("objType.refClass", objType.refClass().refMofId())
                     );
                 }
             }
@@ -2099,14 +2078,14 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
 
         @Override
         public Object refGetValue(
-            RefObject feature
+                RefObject feature
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, feature);
         }
 
         @Override
         public Object refGetValue(
-            String featureName
+                String featureName
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, featureName);
         }
@@ -2114,8 +2093,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         @Override
         @SuppressWarnings("rawtypes")
         public Object refInvokeOperation(
-            RefObject requestedOperation,
-            List args
+                RefObject requestedOperation,
+                List args
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, requestedOperation);
         }
@@ -2123,24 +2102,24 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         @Override
         @SuppressWarnings("rawtypes")
         public Object refInvokeOperation(
-            String requestedOperation,
-            List args
+                String requestedOperation,
+                List args
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, requestedOperation);
         }
 
         @Override
         public void refSetValue(
-            RefObject feature,
-            Object value
+                RefObject feature,
+                Object value
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, feature);
         }
 
         @Override
         public void refSetValue(
-            String featureName,
-            Object value
+                String featureName,
+                Object value
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, featureName);
         }
@@ -2155,7 +2134,7 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         ) {
             if (this.metaObject == null) try {
                 this.metaObject = new RefMetaObject_1(
-                   refOutermostPackage().refModel().getElement(this.refClass().refMofId())
+                        refOutermostPackage().refModel().getElement(this.refClass().refMofId())
                 );
             }
             catch (ServiceException e) {
@@ -2169,7 +2148,7 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         ) {
             Path objectId = refGetPath();
             return
-                objectId == null ? null : objectId.toXRI();
+                    objectId == null ? null : objectId.toXRI();
         }
 
         @Override
@@ -2181,14 +2160,14 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         @Override
         @SuppressWarnings("rawtypes")
         public Collection refVerifyConstraints(
-            boolean deepVerify
+                boolean deepVerify
         ) {
             if(this.cciDelegate instanceof RefObject) {
                 return ((RefObject)this.cciDelegate).refVerifyConstraints(deepVerify);
             }
             else {
                 throw newUnsupportedOperationException(
-                    DelegatingRefObject_1.STANDARD, "refVerifyConstraints"
+                        DelegatingRefObject_1.STANDARD, "refVerifyConstraints"
                 );
             }
         }
@@ -2203,8 +2182,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         public Object openmdxjdoGetDataObject(
         ) {
             return this.cciDelegate instanceof DelegatingRefObject_1_0 ?
-                ((DelegatingRefObject_1_0)this.cciDelegate).openmdxjdoGetDataObject() :
-                this.cciDelegate;
+                    ((DelegatingRefObject_1_0)this.cciDelegate).openmdxjdoGetDataObject() :
+                    this.cciDelegate;
         }
 
         @Override
@@ -2215,8 +2194,8 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
             }
             else {
                 throw newUnsupportedOperationException(
-                    DelegatingRefObject_1.STANDARD,
-                    "refDefaultFetchGroup"
+                        DelegatingRefObject_1.STANDARD,
+                        "refDefaultFetchGroup"
                 );
             }
         }
@@ -2225,78 +2204,78 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         public ObjectView_1_0 refDelegate(
         ) {
             throw newUnsupportedOperationException(
-                DelegatingRefObject_1.STANDARD,
-                "refDelegate"
+                    DelegatingRefObject_1.STANDARD,
+                    "refDelegate"
             );
         }
 
         @Override
         public long refGetValue(
-            String feature,
-            Object value,
-            long position
+                String feature,
+                Object value,
+                long position
         ) {
             throw newUnsupportedOperationException(REFLECTIVE, feature);
         }
 
         @Override
         public void refInitialize(
-            boolean setRequiredToNull,
-            boolean setOptionalToNull,
-            boolean emptyMultivalued
+                boolean setRequiredToNull,
+                boolean setOptionalToNull,
+                boolean emptyMultivalued
         ) {
             if(this.cciDelegate instanceof RefObject_1_0) {
                 ((RefObject_1_0)this.cciDelegate).refInitialize(
-                    setRequiredToNull,
-                    setOptionalToNull,
-                    emptyMultivalued
+                        setRequiredToNull,
+                        setOptionalToNull,
+                        emptyMultivalued
                 );
             } else {
                 throw newUnsupportedOperationException(
-                    DelegatingRefObject_1.STANDARD,
-                    "refInitialize"
+                        DelegatingRefObject_1.STANDARD,
+                        "refInitialize"
                 );
             }
         }
 
         @Override
         public void refSetValue(
-            String feature,
-            Object newValue,
-            long length
+                String feature,
+                Object newValue,
+                long length
         ) {
             throw newUnsupportedOperationException(DelegatingRefObject_1.REFLECTIVE, feature);
         }
 
         private UnsupportedOperationException newUnsupportedOperationException(
-            String message,
-            String feature
+                String message,
+                String feature
         ){
             return new UnsupportedOperationException(
-                newExceptionMessage(
-                    message + ": Feature " + feature + " in class " + this.refClass.refMofId()
-                )
+                    newExceptionMessage(
+                            message + ": Feature " + feature + " in class " + this.refClass.refMofId()
+                    )
             );
         }
 
         private UnsupportedOperationException newUnsupportedOperationException(
-            String message,
-            RefObject feature
+                String message,
+                RefObject feature
         ){
             return new UnsupportedOperationException(
-                newExceptionMessage(
-                    message + ": Feature " + feature.refMofId()
-                )
+                    newExceptionMessage(
+                            message + ": Feature " + feature.refMofId()
+                    )
             );
         }
 
         private String newExceptionMessage(
-            String message
+                String message
         ){
             Object objectId = ReducedJDOHelper.getObjectId(this.cciDelegate);
             return objectId == null ?
-                message :
-                message + " on object " + objectId;
+                    message :
+                    message + " on object " + objectId;
         }
 
         @Override
@@ -2312,9 +2291,9 @@ public class Jmi1ObjectInvocationHandler implements InvocationHandler, Serializa
         @Override
         public RefObject openmdxjdoClone(String... exclude) {
             return this.refClass.refCreateInstance(
-                Collections.singletonList(
-                    ((Cloneable<?>)this.cciDelegate).openmdxjdoClone(exclude)
-                )
+                    Collections.singletonList(
+                            ((Cloneable<?>)this.cciDelegate).openmdxjdoClone(exclude)
+                    )
             );
         }
 
