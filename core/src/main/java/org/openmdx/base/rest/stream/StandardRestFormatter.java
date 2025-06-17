@@ -765,11 +765,81 @@ public class StandardRestFormatter implements RestFormatter {
         if (index != null) {
             writer.writeAttribute("index", index.toString());
         }
-        #if CLAASSIC_CHRONO_TYPES
-        Set<Map.Entry> entries = record.entrySet();
+//        #if CLAASSIC_CHRONO_TYPES
+//        Set<Map.Entry> entries = record.entrySet();
+//        for (Map.Entry<String, ?> entry : entries) {
+//            String feature = entry.getKey();
+//            Object value = entry.getValue();
+//            try {
+//                printValue(
+//                    target,
+//                    indent,
+//                    xri,
+//                    feature,
+//                    value,
+//                    isAnyType(record.getRecordName(), feature),
+//                    serializeNulls
+//                );
+//            } catch (Exception exception) {
+//                SysLog.warning(
+//                    "Collection element print failure",
+//                    new ServiceException(
+//                        exception,
+//                        BasicException.Code.DEFAULT_DOMAIN,
+//                        BasicException.Code.PROCESSING_FAILURE,
+//                        "Unable to retrieve feature value",
+//                        new BasicException.Parameter("hrefContext", target.getBase()),
+//                        new BasicException.Parameter(BasicException.Parameter.XRI, xri),
+//                        new BasicException.Parameter("id", id),
+//                        new BasicException.Parameter("feature", feature)
+//                    )
+//                );
+//            }
+//        }
+//        target.getWriter().writeEndElement(); // tag
+//
+//        #else
+
+    if (record instanceof MappedRecord) {
+
+        Set<Map.Entry> entries = ((MappedRecord)record).entrySet();
         for (Map.Entry<String, ?> entry : entries) {
             String feature = entry.getKey();
             Object value = entry.getValue();
+            try {
+                printValue(
+                        target,
+                        indent,
+                        xri,
+                        feature,
+                        value,
+                        isAnyType(record.getRecordName(), feature),
+                        serializeNulls
+                );
+            } catch (Exception exception) {
+                SysLog.warning(
+                        "Collection element print failure",
+                        new ServiceException(
+                                exception,
+                                BasicException.Code.DEFAULT_DOMAIN,
+                                BasicException.Code.PROCESSING_FAILURE,
+                                "Unable to retrieve feature value",
+                                new BasicException.Parameter("hrefContext", target.getBase()),
+                                new BasicException.Parameter(BasicException.Parameter.XRI, xri),
+                                new BasicException.Parameter("id", id),
+                                new BasicException.Parameter("feature", feature)
+                        )
+                );
+            }
+        }
+
+    } else if (record instanceof IndexedRecord) {
+
+        IndexedRecord indexedRecord = (IndexedRecord) record;
+        for (int i = 0; i < indexedRecord.size(); i++) {
+            Object value = indexedRecord.get(i);
+            String feature = String.valueOf(i); // Use index as feature name, or define a proper naming strategy
+
             try {
                 printValue(
                     target,
@@ -796,83 +866,10 @@ public class StandardRestFormatter implements RestFormatter {
                 );
             }
         }
-        target.getWriter().writeEndElement(); // tag
+    }
+    target.getWriter().writeEndElement(); // tag
 
-        #else
-
-        if (record instanceof MappedRecord) {
-
-            Set<Map.Entry> entries = ((MappedRecord)record).entrySet();
-            for (Map.Entry<String, ?> entry : entries) {
-                String feature = entry.getKey();
-                Object value = entry.getValue();
-                try {
-                    printValue(
-                            target,
-                            indent,
-                            xri,
-                            feature,
-                            value,
-                            isAnyType(record.getRecordName(), feature),
-                            serializeNulls
-                    );
-                } catch (Exception exception) {
-                    SysLog.warning(
-                            "Collection element print failure",
-                            new ServiceException(
-                                    exception,
-                                    BasicException.Code.DEFAULT_DOMAIN,
-                                    BasicException.Code.PROCESSING_FAILURE,
-                                    "Unable to retrieve feature value",
-                                    new BasicException.Parameter("hrefContext", target.getBase()),
-                                    new BasicException.Parameter(BasicException.Parameter.XRI, xri),
-                                    new BasicException.Parameter("id", id),
-                                    new BasicException.Parameter("feature", feature)
-                            )
-                    );
-                }
-            }
-            target.getWriter().writeEndElement(); // tag
-
-        } else if (record instanceof IndexedRecord) {
-
-            IndexedRecord indexedRecord = (IndexedRecord) record;
-            for (int i = 0; i < indexedRecord.size(); i++) {
-                Object value = indexedRecord.get(i);
-                String feature = String.valueOf(i); // Use index as feature name, or define a proper naming strategy
-
-                try {
-                    printValue(
-                        target,
-                        indent,
-                        xri,
-                        feature,
-                        value,
-                        isAnyType(record.getRecordName(), feature),
-                        serializeNulls
-                    );
-                } catch (Exception exception) {
-                    SysLog.warning(
-                        "Collection element print failure",
-                        new ServiceException(
-                            exception,
-                            BasicException.Code.DEFAULT_DOMAIN,
-                            BasicException.Code.PROCESSING_FAILURE,
-                            "Unable to retrieve feature value",
-                            new BasicException.Parameter("hrefContext", target.getBase()),
-                            new BasicException.Parameter(BasicException.Parameter.XRI, xri),
-                            new BasicException.Parameter("id", id),
-                            new BasicException.Parameter("feature", feature)
-                        )
-                    );
-                }
-            }
-            target.getWriter().writeEndElement(); // tag
-
-
-        }
-
-        #endif
+//        #endif
 
     }
 

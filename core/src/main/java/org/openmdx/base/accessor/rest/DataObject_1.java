@@ -53,7 +53,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -2176,10 +2175,10 @@ public class DataObject_1
      */
     private void assertReadLock(
         DataObject_1_0 beforeImage,
-        #if CLASSIC_CHRONO_TYPES java.util.Date #else Instant #endif lockValue
+        #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif lockValue
     )
         throws ServiceException {
-        #if CLASSIC_CHRONO_TYPES java.util.Date #else Instant #endif currentValue = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(SystemAttributes.MODIFIED_AT));
+        #if CLASSIC_CHRONO_TYPES java.util.Date #else java.time.Instant #endif currentValue = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(SystemAttributes.MODIFIED_AT));
         if (currentValue != null) {
             if (currentValue.#if CLASSIC_CHRONO_TYPES after #else isAfter #endif(lockValue)) {
                 throw new ServiceException(
@@ -2212,11 +2211,11 @@ public class DataObject_1
             try {
                 String lockFeature = lockMatcher.group(1);
                     #if CLASSIC_CHRONO_TYPES java.util.Date #else
-                Instant #endif currentValue
+                java.time.Instant #endif currentValue
                         = Datatypes.DATE_TIME_CLASS.cast(beforeImage.objGetValue(lockFeature));
                 if (currentValue != null) {
                         #if CLASSIC_CHRONO_TYPES java.util.Date #else
-                    Instant #endif lockValue
+                    java.time.Instant #endif lockValue
                             = DateTimeFormat.EXTENDED_UTC_FORMAT.parse(lockMatcher.group(2) + "Z");
                     if (!lockValue.equals(currentValue)) {
                         throw new ServiceException(
